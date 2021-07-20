@@ -1,5 +1,8 @@
 public class JavaSourceSample {
-    // TODO: manejar atributos de clase
+
+    public static String crossVariable;
+    public int lazyIdentity = 0;
+    public static double obsFactor = 9;
 
     public static void main(String[] args) {
         System.out.println("Hello world!");

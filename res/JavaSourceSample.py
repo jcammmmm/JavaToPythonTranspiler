@@ -1,4 +1,10 @@
 class JavaSourceSample:
+  crossVariable = ''
+  obsFactor = 9
+
+  def __init__(self, lazyIdentity=0):
+    self.lazyIdentity = lazyIdentity
+
   def main(args):
     print("Hello world!")
     j = JavaSourceSample()

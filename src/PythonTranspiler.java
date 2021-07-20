@@ -11,17 +11,22 @@ import java.util.*;
 
 public class PythonTranspiler implements Java8ParserListener {
 
-    private static final String TAB = "  ";
+    // control de la generacion de la traduccion
+    private static final String TAB = "  ";                                      // tamanio de una identacion
+    private static final String INSTANCE_VAR_PLACEHOLDER = "?instance_vars";     // placeholder para insertar constructor con variables de instancia
+    private static final String CLASS_VAR_PLACEHOLDER = "?class_vars";           // placeholder para insertar variables de clase
 
-    private final StringBuilder transpiledSource;
-    private final boolean enableDebugOutput;
-    // general identation control
-    private int tabDepth;
-    // for 'selectionar' translation
+    private String compilationUnitName;         // nombre del archivo Java
+    private int tabDepth;                       // profundidad de la identacion
     private Stack<Integer> switchState = new Stack<>(); // 0 = initial if, 1 = elif, 2 = else
 
-    private String mainLocation = "";
-    private String compilationUnitName;
+    // control de codigo fuente de salida
+    private final StringBuilder transpiledSource;
+    private final boolean enableDebugOutput;
+
+    // control de variables del codigo fuente origen
+    private Map<String, String> classVariables;
+    private Map<String, String> instanceVariables;
 
     /**
      * Para no tener que estar escribiendo System.out.println(o.toString())
@@ -32,10 +37,15 @@ public class PythonTranspiler implements Java8ParserListener {
     }
 
     public PythonTranspiler(String filename) {
+        // impl.
+        compilationUnitName = filename;
+        tabDepth = 0;
+
         transpiledSource = new StringBuilder();
         enableDebugOutput = false;
-        tabDepth = 0;
-        compilationUnitName = filename;
+
+        classVariables = new HashMap<>();
+        instanceVariables = new HashMap<>();
         System.out.println("Transpiling this compilation unit (filename): " + filename);
     }
 
@@ -45,6 +55,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @param addNewline indica si debe ir en la misma linea, o en la siguiente.
      */
     public void appendToTranspiledSrc(String src, boolean addNewline) {
+        // impl.
         // TODO: src = fixBloatSpaces(src);
         if (addNewline) {
             transpiledSource
@@ -65,6 +76,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @param src codigo fuente traducido
      */
     public void append(String src) {
+        // impl.
         appendToTranspiledSrc(src, false);
     }
 
@@ -74,15 +86,21 @@ public class PythonTranspiler implements Java8ParserListener {
      * @param src codigo fuente traducido
      */
     public void appendln(String src) {
+        // impl.
         appendToTranspiledSrc(src, true);
     }
 
     /**
      * Un getter para el contenido del StringBuilder que esta concatenando la traduccion.
+     * Se realizan traducciones offline y se mejorar estrucuturalmente el codigo de salida.
      * @return
      */
     public String getTranspiledSource() {
-        return transpiledSource.toString();
+        // impl.
+        String pythonSource = transpiledSource.toString();
+        pythonSource = insertVariables(pythonSource);      // inserta variables
+        pythonSource = removePlaceHolders(pythonSource);   // elimina cualquier placeholder
+        return pythonSource;
     }
 
     /**
@@ -91,6 +109,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @return
      */
     public String getInitValue(String type) {
+        // impl.
         switch (type) {
             case "double":
             case "Double":
@@ -101,7 +120,7 @@ public class PythonTranspiler implements Java8ParserListener {
             case "char":
             case "Char":
             case "String":
-                return "";
+                return "''";
             case "boolean":
             case "Boolean":
                 return "False";
@@ -120,6 +139,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @return
      */
     public boolean hasParent(ParserRuleContext startCtx, String parentContextName) {
+        // impl.
         ParserRuleContext currCtx = startCtx.getParent();
         boolean parentFound = false;
         try {
@@ -139,24 +159,81 @@ public class PythonTranspiler implements Java8ParserListener {
     }
 
     /**
-    public String getExpression(PsiCoderParser.ExpresionContext exprCtx) {
-        int ini = exprCtx.getStart().getStartIndex();
-        int end = exprCtx.getStop().getStopIndex();
-        Interval ival = new Interval(ini, end);
-        return exprCtx.start.getInputStream().getText(ival);
-    }
-     */
-
-    /**
      * Traduce los operadores logicos de una expresion booleana en Java a Python
      * @param boolExpr
      * @return
      */
     public String replaceBooleanOps(String boolExpr) {
+        // impl.
         boolExpr = boolExpr.replace("||", " or ");
         boolExpr = boolExpr.replace("&&", " and ");
         boolExpr = boolExpr.replace("!", " not ");
         return fixBloatSpaces(boolExpr);
+    }
+
+    /**
+     * Contiene otros metodos que realizan relleno con declaracion de variables. Como
+     * en python la declaracion de variables de instancia se hace con el constructor,
+     * también puede implicar la creacion de traductores para la equivalencia semantica.
+     *
+     * https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables
+     */
+    private String insertVariables(String pythonSource) {
+        pythonSource = insertClassVariables(pythonSource);
+        pythonSource = insertInstanceVariables(pythonSource); // crea constructor
+        return pythonSource;
+    }
+
+    /**
+     * Inserta las variables estaticas a la traduccion en los lugares del los placeholders.
+     * @param pythonSource resultado de la traduccion online del codigo fuente
+     * @return
+     */
+    private String insertClassVariables(String pythonSource) {
+        tabDepth++;
+        StringBuilder varDeclarations = new StringBuilder();
+        for (Map.Entry<String, String> varDcl : classVariables.entrySet())
+            varDeclarations.append(String.format("%s%s = %s\n", TAB.repeat(tabDepth), varDcl.getKey(), varDcl.getValue()));
+        tabDepth--;
+        return pythonSource.replace(CLASS_VAR_PLACEHOLDER, varDeclarations.toString());
+    }
+
+    /**
+     * Inserta las variables de instancia a la traduccion en los lugares del los placeholders. Se hace doble iteracion
+     * para mayor claridad del codigo.
+     * @param pythonSource resultado de la traduccion online del codigo fuente.
+     */
+    private String insertInstanceVariables(String pythonSource) {
+        StringBuilder constructorDcl = new StringBuilder();
+        // Declaracion del constructor
+        tabDepth++; // identacion para el __init__()
+        List<String> constructorArgs = new LinkedList<>();
+        for (Map.Entry<String, String> varDcl : instanceVariables.entrySet())
+            constructorArgs.add(String.format("%s=%s", varDcl.getKey(), varDcl.getValue()));
+        constructorDcl.append(String.format("%sdef __init__(self, %s):\n", TAB.repeat(tabDepth), String.join(", ", constructorArgs)));
+
+        // Cuerpo del constructor
+        tabDepth++; // identacion para el cuerpo
+        for (Map.Entry<String, String> varDcl : instanceVariables.entrySet())
+            constructorDcl.append(String.format("%sself.%s = %s", TAB.repeat(tabDepth), varDcl.getKey(), varDcl.getKey()));
+        constructorDcl.append("\n");
+        tabDepth--;
+        tabDepth--;
+
+        pythonSource = pythonSource.replace(INSTANCE_VAR_PLACEHOLDER, constructorDcl.toString());
+        return pythonSource;
+    }
+
+    /**
+     * Elimina cualquier place holder que no se haya reemplazado en la fase offline de la
+     * traduccion.
+     * @param pythonSource
+     * @return
+     */
+    private String removePlaceHolders(String pythonSource) {
+        pythonSource = pythonSource.replace(CLASS_VAR_PLACEHOLDER, "");
+        pythonSource = pythonSource.replace(INSTANCE_VAR_PLACEHOLDER, "");
+        return pythonSource;
     }
 
     /**
@@ -167,6 +244,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @return
      */
     public String fixBloatSpaces(String src) {
+        // impl.
         src = src.replace("  ", " "); // quitar espacios en blanco que sobran
         src = src.replaceAll("=", " = ").trim();
         src = src.replaceAll(" =  = ", "==").trim(); // fix para el operador
@@ -578,10 +656,20 @@ public class PythonTranspiler implements Java8ParserListener {
 
     }
 
+    /**
+     * Ademas de traducir la declaracion de la clase, agrega dos tokens para localizar
+     * la ubicacion de las variables de instancia y clase. Los marcadores son:
+     * - ?instance_vars
+     * - ?class_vars
+     *
+     * @param ctx the parse tree
+     */
     @Override
     public void enterClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
         // impl.
         appendln("class " + compilationUnitName + ":");
+        appendln(CLASS_VAR_PLACEHOLDER);
+        appendln(INSTANCE_VAR_PLACEHOLDER);
     }
 
     @Override
@@ -689,9 +777,45 @@ public class PythonTranspiler implements Java8ParserListener {
 
     }
 
+    /**
+     * Este metodo no realiza la traduccion directa del codigo Java. Acumula las traducciones en unos
+     * diccionarios, que se procesan al final de la traduccion del archivo. Esto se hace para manejar
+     * el caso de las variables de instancia que en Python no se manejan a traves de palabras reservadas,
+     * sino con el manejo de constructores.
+     * La esta traduccion con delay se hace tambien para mantener las declaraciones de atributos y
+     * constructores en la parte inicial del archivo de codigo fuente.
+     * @param ctx the parse tree
+     */
     @Override
     public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
+        // impl.
+        boolean isStatic = false;
+        if (ctx.fieldModifier() != null)
+            for (Java8Parser.FieldModifierContext mod : ctx.fieldModifier())
+                if (mod.getText().contains("static"))
+                    isStatic = true;
 
+        // https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables
+        for (Java8Parser.VariableDeclaratorContext varDcl : ctx.variableDeclaratorList().variableDeclarator()) {
+            String identifier = varDcl.variableDeclaratorId().getText();
+            String value;
+            if (varDcl.variableInitializer() == null) {
+                // Se declara pero no se inicializa. Se asigna valor por defecto.
+                String type = ctx.unannType().getText().trim();
+                value = getInitValue(type);
+            } else {
+                value = varDcl.variableInitializer().getText();
+            }
+
+            // a medida que se van procesando los atributos de clase, se van agregando a en un hash
+            // para cuando se acabe la traduccion del archivo se agregen al inicio luego de la declaracion
+            // de clase del archivo de salida.
+            if (isStatic) {
+                classVariables.put(identifier, value);
+            } else {
+                instanceVariables.put(identifier, value);
+            }
+        }
     }
 
     @Override
@@ -1777,6 +1901,7 @@ public class PythonTranspiler implements Java8ParserListener {
      */
     @Override
     public void enterBasicForStatement(Java8Parser.BasicForStatementContext ctx) {
+        // impl.
         // VARIABLE DE ITERACION
         // Obtener variable de control de iteracion
         String identifier;
@@ -1817,6 +1942,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void exitBasicForStatement(Java8Parser.BasicForStatementContext ctx) {
+        // impl.
         // EXPRESION DE FINALIZACION
         // Salir del la estructura for implica haber salido del bloque interno, por lo que se aumenta y reduce la
         // identacion para que quede en el dominio del ciclo. Se recomienda leer la documentacion en este punto

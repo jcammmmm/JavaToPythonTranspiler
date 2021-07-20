@@ -28,13 +28,15 @@ métodos estáticos y conservar métodos y atributos de instancia sin la necesid
 verbosidad de la palabra `static` cada vez que se define un identificador.
 
 # Caracteristicas
+- Se reconocen como diferentes los tipos estaticos y los de instancia. Se realiza la
+  traduccion de acuerdo a: https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables
 - El transpilador hace distincion entre los métodos que son estáticos y los que no.
 - El metodo reconoce bloques vacíos y los traduce como `pass`.
 - Siempre se añade una traducción para que el metodo main se ejecute.
 - El manejo de tipos y operadores está en su fase inicial, por lo que se recomienda
   que el codigo fuente Java indique apropiadamente los tipos de los operandos, porque
   expresiones como `double/int` podría NO dar entero como esperaria el programador.
-- El traductor tiene cuida la estética de los operadores, por lo que hace una curación
+- El traductor cuida la estética de los operadores, por lo que hace una curación
   de espacios en blanco cada vez que se agrega una nueva linea.
 
 # Estructura
@@ -48,6 +50,13 @@ se aumenta la identacion. Cada vez que se sale se decrementa en una unidad.
 Para buscar navegar rapidamente por la implementacion basta con buscar el comentario
 `// impl.`. Todos los metodos que han sido implementados tienen esta marca en la primer
 linea del cuerpo.
+
+La traduccion tiene una fase online y otra offline. En la online se va realizando la traduccion
+a medida que se va procesando el codigo fuente. En la offline se reemplazan porciones de texto
+con contenido que va recopilando a medida que se realiza la compilacion online. La traduccion
+offline se usa en el caso de atributos de clase y de instancia porque en Python y Java esta
+característica se maneja de formas diferentes.
+
 
 # Notas Dev.
 - No agregar tildes a ningun codigo fuente.
