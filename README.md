@@ -5,9 +5,9 @@ El codigo fuente en Java se supone que tiene las siguientes características:
 - El codigo java solo hace uso de utilidades basicas de su librerias estandar   
 - Sólo transpila programas de un solo archivo Java sin clases anidadas    
     * El tema de invocación de métodos es más sencillo    
-- Todos los metodos de la fuente en Java deben ser estáticos   
 - El uso de los corchetes para delimitar bloques es obligatorio. Esto puede afectar
   la identacion del codigo fuente en algunos casos. Por ejemplo en `for (i = 0; i < 2; i++) print(i)` 
+- (Soportado!) Todos los metodos de la fuente en Java deben ser estáticos   
 
 ### Ciclos
 - Solo se admiten expresiones booleanas dentro de la condicion de terminacion
@@ -34,6 +34,8 @@ verbosidad de la palabra `static` cada vez que se define un identificador.
 - El manejo de tipos y operadores está en su fase inicial, por lo que se recomienda
   que el codigo fuente Java indique apropiadamente los tipos de los operandos, porque
   expresiones como `double/int` podría NO dar entero como esperaria el programador.
+- El traductor tiene cuida la estética de los operadores, por lo que hace una curación
+  de espacios en blanco cada vez que se agrega una nueva linea.
 
 # Estructura
 El atributo de clase estático `tabDepth` controla la identación a medida que se procesa

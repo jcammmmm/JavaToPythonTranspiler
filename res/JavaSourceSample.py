@@ -17,17 +17,21 @@ class JavaSourceSample:
 
   def forLoop(self, ):
     i = 2
-    while i<100:
+    while i<500 and i%1==0:
       print(i/2)
       i=i*i
+      
     j = 12
-    while j<30:
-      pass
+    j = 2
+    while not (j>30):
+      print(j)
       j=j*j
+      
     k = 2
     while k<10:
       pass
       k=k*k
+      
 
 import sys
 if __name__ == '__main__':

@@ -25,7 +25,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     /**
      * Para no tener que estar escribiendo System.out.println(o.toString())
-     * @param o
+     * @param o el objeto a mostrar
      */
     public void print(Object o) {
         System.out.println(o.toString());
@@ -39,7 +39,13 @@ public class PythonTranspiler implements Java8ParserListener {
         System.out.println("Transpiling this compilation unit (filename): " + filename);
     }
 
+    /**
+     * Agrega codigo fuente Python traducido a un StringBuilder.
+     * @param src codigo fuente
+     * @param addNewline indica si debe ir en la misma linea, o en la siguiente.
+     */
     public void appendToTranspiledSrc(String src, boolean addNewline) {
+        // TODO: src = fixBloatSpaces(src);
         if (addNewline) {
             transpiledSource
                     .append(TAB.repeat(tabDepth))
@@ -53,18 +59,37 @@ public class PythonTranspiler implements Java8ParserListener {
             System.out.println(src);
     }
 
+    /**
+     * Agrega una linea de codigo fuente Python sin 'newline' al final, de esta manera la
+     * siguiente linea va al lado (en la misma linea).
+     * @param src codigo fuente traducido
+     */
     public void append(String src) {
         appendToTranspiledSrc(src, false);
     }
 
+    /**
+     * Agrega una linea de codigo fuente Python con 'newline' al final, de esta manera la
+     * siguiente linea va debajo.
+     * @param src codigo fuente traducido
+     */
     public void appendln(String src) {
         appendToTranspiledSrc(src, true);
     }
 
+    /**
+     * Un getter para el contenido del StringBuilder que esta concatenando la traduccion.
+     * @return
+     */
     public String getTranspiledSource() {
         return transpiledSource.toString();
     }
 
+    /**
+     * Obtiene un valor de inicializacion por defecto segun el tipo de variable.
+     * @param type
+     * @return
+     */
     public String getInitValue(String type) {
         switch (type) {
             case "double":
@@ -122,9 +147,31 @@ public class PythonTranspiler implements Java8ParserListener {
     }
      */
 
-    public String replaceBooleanOps(String src) {
-        src = src.replace("||", " or ");
-        src = src.replace("&&", " and ");
+    /**
+     * Traduce los operadores logicos de una expresion booleana en Java a Python
+     * @param boolExpr
+     * @return
+     */
+    public String replaceBooleanOps(String boolExpr) {
+        boolExpr = boolExpr.replace("||", " or ");
+        boolExpr = boolExpr.replace("&&", " and ");
+        boolExpr = boolExpr.replace("!", " not ");
+        return fixBloatSpaces(boolExpr);
+    }
+
+    /**
+     * TODO
+     * Cambia varios espacios en blanco por uno solo, separa operador de asignaciones y arregla cualquier
+     * tema estetico de espacios del codigo fuente.
+     * @param src
+     * @return
+     */
+    public String fixBloatSpaces(String src) {
+        src = src.replace("  ", " "); // quitar espacios en blanco que sobran
+        src = src.replaceAll("=", " = ").trim();
+        src = src.replaceAll(" =  = ", "==").trim(); // fix para el operador
+        src = src.replaceAll(">  =", ">=").trim(); // fix para el operador
+        src = src.replaceAll("<  =", "<=").trim(); // fix para el operador
         return src;
     }
 
@@ -1734,18 +1781,25 @@ public class PythonTranspiler implements Java8ParserListener {
         // Obtener variable de control de iteracion
         String identifier;
         String initVal;
-        if (ctx.forInit() != null && ctx.forInit().localVariableDeclaration() != null) {
+        if (ctx.forInit() != null) {
             Java8Parser.LocalVariableDeclarationContext localVariableDeclaration = ctx.forInit().localVariableDeclaration();
-           Java8Parser.VariableDeclaratorContext variableDeclarator = localVariableDeclaration.variableDeclaratorList().variableDeclarator(0);
-            identifier = variableDeclarator.variableDeclaratorId().getText();
-            if (variableDeclarator.variableInitializer() != null) {
-                initVal = variableDeclarator.variableInitializer().getText();
+            if (localVariableDeclaration != null) {
+                Java8Parser.VariableDeclaratorContext variableDeclarator = localVariableDeclaration.variableDeclaratorList().variableDeclarator(0);
+                identifier = variableDeclarator.variableDeclaratorId().getText();
+                if (variableDeclarator.variableInitializer() != null) {
+                    initVal = variableDeclarator.variableInitializer().getText();
+                } else {
+                    // La variable se ha declarado pero no se ha inicializado dentro del ciclo, por ejemplo:
+                    // for(double k; k < 100; i--).
+                    // Se supone inicializacion por defecto de la variable
+                    String type = localVariableDeclaration.unannType().getText();
+                    initVal = getInitValue(type);
+                }
             } else {
-                // La variable se ha declarado pero no se ha inicializado dentro del ciclo, por ejemplo:
-                // for(double k; k < 100; i--).
-                // Se supone inicializacion por defecto de la variable
-                String type = localVariableDeclaration.unannType().getText();
-                initVal = getInitValue(type);
+                // Se asigna pero no se declara una nueva variable de control para el ciclo, por ejemplo:
+                // for(k = 2; k < 100; k--) {}
+                identifier = ctx.forInit().statementExpressionList().statementExpression(0).assignment().leftHandSide().getText();
+                initVal = ctx.forInit().statementExpressionList().statementExpression(0).assignment().expression().getText();
             }
             appendln(String.format("%s = %s", identifier, initVal));
         } else {
@@ -1757,6 +1811,7 @@ public class PythonTranspiler implements Java8ParserListener {
         // CONDICION DE PARADA
         // Traducir ciclo y expresion de finalizacion
         String endCondition = ctx.expression().getText();
+        endCondition = replaceBooleanOps(endCondition);
         appendln(String.format("while %s:", endCondition));
     }
 
@@ -1778,6 +1833,7 @@ public class PythonTranspiler implements Java8ParserListener {
             updateSmnt = varName + "*= 1";
         }
         appendln(updateSmnt);
+        appendln("");
         tabDepth--;
     }
 
