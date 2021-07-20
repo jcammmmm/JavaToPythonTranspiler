@@ -38,6 +38,11 @@ verbosidad de la palabra `static` cada vez que se define un identificador.
   expresiones como `double/int` podría NO dar entero como esperaria el programador.
 - El traductor cuida la estética de los operadores, por lo que hace una curación
   de espacios en blanco cada vez que se agrega una nueva linea.
+- El metodo `main` se debe ser el método que se encuentra más abajo de todos los métodos y 
+  todos los métodos estáticos debe aparecer primero antes que los de clase. Esto con el 
+  fin de que la invocacion de los metodos se haga de manera correcta al momento de la
+  traduccion. Este es un TODO que consiste en hacer la traduccion de los métodos de forma
+  offline para precindir del ordenamiento que se indica. 
 
 # Estructura
 El atributo de clase estático `tabDepth` controla la identación a medida que se procesa

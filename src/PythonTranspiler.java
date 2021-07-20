@@ -27,6 +27,8 @@ public class PythonTranspiler implements Java8ParserListener {
     // control de variables del codigo fuente origen
     private Map<String, String> classVariables;
     private Map<String, String> instanceVariables;
+    private Set<String> classMethods;
+    private Set<String> instanceMethods;
 
     /**
      * Para no tener que estar escribiendo System.out.println(o.toString())
@@ -46,6 +48,8 @@ public class PythonTranspiler implements Java8ParserListener {
 
         classVariables = new HashMap<>();
         instanceVariables = new HashMap<>();
+        classMethods = new HashSet<>();
+        instanceMethods = new HashSet<>();
         System.out.println("Transpiling this compilation unit (filename): " + filename);
     }
 
@@ -179,6 +183,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables
      */
     private String insertVariables(String pythonSource) {
+        // impl.
         pythonSource = insertClassVariables(pythonSource);
         pythonSource = insertInstanceVariables(pythonSource); // crea constructor
         return pythonSource;
@@ -190,6 +195,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @return
      */
     private String insertClassVariables(String pythonSource) {
+        // impl.
         tabDepth++;
         StringBuilder varDeclarations = new StringBuilder();
         for (Map.Entry<String, String> varDcl : classVariables.entrySet())
@@ -204,6 +210,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @param pythonSource resultado de la traduccion online del codigo fuente.
      */
     private String insertInstanceVariables(String pythonSource) {
+        // impl.
         StringBuilder constructorDcl = new StringBuilder();
         // Declaracion del constructor
         tabDepth++; // identacion para el __init__()
@@ -231,6 +238,7 @@ public class PythonTranspiler implements Java8ParserListener {
      * @return
      */
     private String removePlaceHolders(String pythonSource) {
+        // impl.
         pythonSource = pythonSource.replace(CLASS_VAR_PLACEHOLDER, "");
         pythonSource = pythonSource.replace(INSTANCE_VAR_PLACEHOLDER, "");
         return pythonSource;
@@ -1020,10 +1028,16 @@ public class PythonTranspiler implements Java8ParserListener {
 
         String funParams = String.join(", ", paramNames);
         String funDcl;
-        if (isStatic)
+        if (isStatic) {
+            classMethods.add(funName);
             funDcl = String.format("def %s(%s):", funName, funParams);
-        else
-            funDcl = String.format("def %s(self, %s):", funName, funParams);
+        } else {
+            instanceMethods.add(funName);
+            if (funParams.isEmpty())
+                funDcl = String.format("def %s(self):", funName);
+            else
+                funDcl = String.format("def %s(self, %s):", funName, funParams);
+        }
         appendln(funDcl);
     }
 
@@ -2378,7 +2392,16 @@ public class PythonTranspiler implements Java8ParserListener {
         // impl.
         String args;
         try {
-            args = ctx.argumentList().getText();
+            String[] argVals = ctx.argumentList().getText().split(",");
+            for (int i = 0; i < argVals.length; i++) {
+                String val = argVals[i].trim();
+                if (classVariables.containsKey(val)) {
+                    argVals[i] = String.format("%s.%s", compilationUnitName, val);
+                } else if (instanceVariables.containsKey(val)) {
+                    argVals[i] = String.format("self.%s", val);
+                }
+            }
+            args = String.join(", ", argVals);
         } catch (NullPointerException npe) {
             // se trata de una funcion sin argumentos
             args = "";
@@ -2389,17 +2412,25 @@ public class PythonTranspiler implements Java8ParserListener {
             appendln(String.format("print(%s)", args));
             return;
         } else {
+            String methodInvocationExpr;
             if (ctx.methodName() == null) {
-                // sucede cuando el llamado no se hace directamente a traves del idenetificador del metodo como en
+                // invocacion de metodos de instancia (no estaticos):
+                // sucede cuando el llamado NO se hace directamente a traves del identificador del metodo como en
                 // 'nombreDelMetodo(argumento, otro)' sino que se realiza a traves de una instancia como en
                 // 'unaInstancia.nombreDelMetodo(argumento, otro)'
                 String objName = ctx.typeName().getText();
                 String methodName = ctx.Identifier().getText();
-                appendln(String.format("%s.%s(%s)", objName, methodName, args));
+                methodInvocationExpr = String.format("%s.%s(%s)", objName, methodName, args);
             } else {
                 String methodName = ctx.methodName().getText();
-                appendln(String.format("self.%s(%s)", methodName, args));
+                boolean isAnStaticInvocation = classMethods.contains(methodName);
+                if (isAnStaticInvocation) {
+                    methodInvocationExpr = String.format("%s.%s(%s)", compilationUnitName, methodName, args);
+                } else {
+                    methodInvocationExpr = String.format("self.%s(%s)", methodName, args);
+                }
             }
+            appendln(methodInvocationExpr);
         }
 
     }

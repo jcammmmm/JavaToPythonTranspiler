@@ -5,11 +5,11 @@ class JavaSourceSample:
   def __init__(self, lazyIdentity=0):
     self.lazyIdentity = lazyIdentity
 
-  def main(args):
-    print("Hello world!")
-    j = JavaSourceSample()
-    j.show(3,"algo",args)
-    j.forLoop()
+  def instanceFun(self):
+    print(self.lazyIdentity)
+
+  def staticFun():
+    print(JavaSourceSample.obsFactor)
 
   def show(self, j, smthg, o):
     x = 0
@@ -21,7 +21,7 @@ class JavaSourceSample:
     print(s)
     print(n)
 
-  def forLoop(self, ):
+  def forLoop(self):
     i = 2
     while i<500 and i%1==0:
       print(i/2)
@@ -38,6 +38,14 @@ class JavaSourceSample:
       pass
       k=k*k
       
+
+  def main(args):
+    print("Hello world!")
+    j = JavaSourceSample()
+    j.show(3, "algo", args)
+    j.forLoop()
+    j.instanceFun()
+    JavaSourceSample.staticFun()
 
 import sys
 if __name__ == '__main__':

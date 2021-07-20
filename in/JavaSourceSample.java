@@ -4,11 +4,12 @@ public class JavaSourceSample {
     public int lazyIdentity = 0;
     public static double obsFactor = 9;
 
-    public static void main(String[] args) {
-        System.out.println("Hello world!");
-        JavaSourceSample j = new JavaSourceSample();
-        j.show(3, "algo", args);
-        j.forLoop();
+    public void instanceFun() {
+        System.out.println(lazyIdentity);
+    }
+
+    public static void staticFun() {
+        System.out.println(obsFactor);
     }
 
     public String show(Integer j, String smthg, Object o) {
@@ -34,5 +35,16 @@ public class JavaSourceSample {
 
         int k = 2;
         for (; k < 10; k = k*k) {}
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Hello world!");
+
+        JavaSourceSample j = new JavaSourceSample();
+        j.show(3, "algo", args);
+        j.forLoop();
+        j.instanceFun();
+
+        staticFun();
     }
 }
