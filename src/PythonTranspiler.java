@@ -1417,6 +1417,9 @@ public class PythonTranspiler implements Java8ParserListener {
     public void enterBlock(Java8Parser.BlockContext ctx) {
         // impl.
         tabDepth++;
+        // Si el bloque esta vacio...
+        if (ctx.blockStatements() == null)
+            appendln("pass");
     }
 
     @Override
@@ -1457,25 +1460,30 @@ public class PythonTranspiler implements Java8ParserListener {
     @Override
     public void enterLocalVariableDeclaration(Java8Parser.LocalVariableDeclarationContext ctx) {
         // impl.
-        // cada tuple es el identificador y su valor inicial
-        List<Pair<String, String>> varDeclarations = new LinkedList<>();
-        String type = ctx.unannType().getText();
-        // se hace ciclo para declaraciones de la forma:
-        // Type t1 = 93, t2, t3 = 4;
-        for(Java8Parser.VariableDeclaratorContext variableDeclarator : ctx.variableDeclaratorList().variableDeclarator()) {
-            String identifier = variableDeclarator.variableDeclaratorId().getText();
-            String value;
-            try {
-                // se hace llamado para intentar lanzar nullpointerexception para indicar que la variable no se inizializa y
-                // por tanto corresponde a nosotros inicializarla para compatibilidad con el lenguaje.
-                value = variableDeclarator.variableInitializer().getText();
-                if (value.contains("new"))
-                    value = value.substring(3);
-            } catch (NullPointerException npe) {
-                // este caso sucede cuando no se declara la variable y no se inicializa.
-                value = getInitValue(type);
+        if (hasParent(ctx, "ForStatementContext")) {
+            // En el metodo 'basicForStatement' se maneja la variable principal de iteracion.
+            // Esta condicion se deja para no imprimir nada, pues es una declaracion y el parser
+            // coje por aqui.
+        }
+        else {
+            String type = ctx.unannType().getText();
+            // se hace ciclo para declaraciones de la forma:
+            // Type t1 = 93, t2, t3 = 4;
+            for (Java8Parser.VariableDeclaratorContext variableDeclarator : ctx.variableDeclaratorList().variableDeclarator()) {
+                String identifier = variableDeclarator.variableDeclaratorId().getText();
+                String value;
+                try {
+                    // se hace llamado para intentar lanzar nullpointerexception para indicar que la variable no se inizializa y
+                    // por tanto corresponde a nosotros inicializarla para compatibilidad con el lenguaje.
+                    value = variableDeclarator.variableInitializer().getText();
+                    if (value.contains("new"))
+                        value = value.substring(3);
+                } catch (NullPointerException npe) {
+                    // este caso sucede cuando no se declara la variable y no se inicializa.
+                    value = getInitValue(type);
+                }
+                appendln(String.format("%s = %s", identifier, value));
             }
-            appendln(String.format("%s = %s", identifier, value));
         }
     }
 
@@ -1714,14 +1722,63 @@ public class PythonTranspiler implements Java8ParserListener {
 
     }
 
+    /**
+     * La conversion a ciclos se hace mediante un while porque el for en Python itera a traves de un lista de 'indices'
+     * predefinida y no es común editarla. En cambio, el for de Java es posible que el cuerpo del ciclo altere la variable
+     * de iteracion. Esta es la razon por la cual la conversion se hace con ciclos while.
+     * @param ctx the parse tree
+     */
     @Override
     public void enterBasicForStatement(Java8Parser.BasicForStatementContext ctx) {
+        // VARIABLE DE ITERACION
+        // Obtener variable de control de iteracion
+        String identifier;
+        String initVal;
+        if (ctx.forInit() != null && ctx.forInit().localVariableDeclaration() != null) {
+            Java8Parser.LocalVariableDeclarationContext localVariableDeclaration = ctx.forInit().localVariableDeclaration();
+           Java8Parser.VariableDeclaratorContext variableDeclarator = localVariableDeclaration.variableDeclaratorList().variableDeclarator(0);
+            identifier = variableDeclarator.variableDeclaratorId().getText();
+            if (variableDeclarator.variableInitializer() != null) {
+                initVal = variableDeclarator.variableInitializer().getText();
+            } else {
+                // La variable se ha declarado pero no se ha inicializado dentro del ciclo, por ejemplo:
+                // for(double k; k < 100; i--).
+                // Se supone inicializacion por defecto de la variable
+                String type = localVariableDeclaration.unannType().getText();
+                initVal = getInitValue(type);
+            }
+            appendln(String.format("%s = %s", identifier, initVal));
+        } else {
+            // No se ha declarado la variable de iteracion dentro del for loop. Por ejemplo:
+            // for(; i < 10; i++)
+            // Se supone que se ha declarado antes de esta proposion for.
+        }
 
+        // CONDICION DE PARADA
+        // Traducir ciclo y expresion de finalizacion
+        String endCondition = ctx.expression().getText();
+        appendln(String.format("while %s:", endCondition));
     }
 
     @Override
     public void exitBasicForStatement(Java8Parser.BasicForStatementContext ctx) {
-
+        // EXPRESION DE FINALIZACION
+        // Salir del la estructura for implica haber salido del bloque interno, por lo que se aumenta y reduce la
+        // identacion para que quede en el dominio del ciclo. Se recomienda leer la documentacion en este punto
+        // si no se entiende en la seccion de 'estructura'.
+        tabDepth++;
+        // Saber si el incremento o decremeto es pre o post no interesa porque la instruccion siempre se ejecuta al
+        // final tanto en el for original como en el while traducido. Por lo tanto no conviente hacer la verificacion.
+        String updateSmnt = ctx.forUpdate().getText();
+        if (updateSmnt.contains("++")) {
+            String varName = updateSmnt.replace("+", "");
+            updateSmnt = varName + "+= 1";
+        } else if (updateSmnt.contains("--")) {
+            String varName = updateSmnt.replace("-", "");
+            updateSmnt = varName + "*= 1";
+        }
+        appendln(updateSmnt);
+        tabDepth--;
     }
 
     @Override
