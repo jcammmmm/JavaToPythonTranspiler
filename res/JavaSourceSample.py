@@ -1,9 +1,9 @@
 class JavaSourceSample:
-  def main(args):
+  def main(self, args):
     print("Hello world!")
-    JavaSourceSample.show(3,"algo",args)
+    self.show(3,"algo",args)
 
-  def show(j, smthg, o):
+  def show(self, j, smthg, o):
     x = 0
     d = 4.4
     b = 10.1
@@ -13,7 +13,7 @@ class JavaSourceSample:
     print(s)
     print(n)
 
-
+import sys
 if __name__ == '__main__':
-  JavaSourceSample.main('')
-
+  javaSourceSample = JavaSourceSample()
+  javaSourceSample.main(sys.argv)

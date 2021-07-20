@@ -446,10 +446,11 @@ public class PythonTranspiler implements Java8ParserListener {
     @Override
     public void exitCompilationUnit(Java8Parser.CompilationUnitContext ctx) {
         // impl.
-        appendln("");
+        String mainInstanceName = compilationUnitName.substring(0,1).toLowerCase(Locale.ROOT) + compilationUnitName.substring(1);
+        appendln("import sys");
         appendln("if __name__ == '__main__':");
-        appendln(String.format("%s%s.main('')", TAB, compilationUnitName));
-        appendln("");
+        appendln(String.format("%s%s = %s()", TAB, mainInstanceName, compilationUnitName));
+        appendln(String.format("%s%s.main(sys.argv)", TAB, mainInstanceName));
     }
 
     @Override
@@ -843,7 +844,7 @@ public class PythonTranspiler implements Java8ParserListener {
         }
 
         String funParams = String.join(", ", paramNames);
-        String funDcl = String.format("def %s(%s):", funName, funParams);
+        String funDcl = String.format("def %s(self, %s):", funName, funParams);
         appendln(funDcl);
     }
 
@@ -2141,7 +2142,7 @@ public class PythonTranspiler implements Java8ParserListener {
             return;
         } else {
             String methodName = ctx.methodName().getText();
-            appendln(String.format("%s.%s(%s)", compilationUnitName, methodName, args));
+            appendln(String.format("self.%s(%s)", methodName, args));
         }
 
     }
