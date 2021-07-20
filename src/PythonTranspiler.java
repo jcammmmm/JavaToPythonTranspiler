@@ -446,11 +446,9 @@ public class PythonTranspiler implements Java8ParserListener {
     @Override
     public void exitCompilationUnit(Java8Parser.CompilationUnitContext ctx) {
         // impl.
-        String mainInstanceName = compilationUnitName.substring(0,1).toLowerCase(Locale.ROOT) + compilationUnitName.substring(1);
         appendln("import sys");
         appendln("if __name__ == '__main__':");
-        appendln(String.format("%s%s = %s()", TAB, mainInstanceName, compilationUnitName));
-        appendln(String.format("%s%s.main(sys.argv)", TAB, mainInstanceName));
+        appendln(String.format("%s%s.main(sys.argv)", TAB, compilationUnitName));
     }
 
     @Override
@@ -832,7 +830,7 @@ public class PythonTranspiler implements Java8ParserListener {
         List<String> paramNames = new LinkedList<>();
         try {
             for (Java8Parser.FormalParameterContext formalParameter : ctx.methodHeader().methodDeclarator().formalParameterList().formalParameters().formalParameter())
-                paramNames.add(formalParameter.variableDeclaratorId().getText());
+            paramNames.add(formalParameter.variableDeclaratorId().getText());
         } catch (NullPointerException npe) {
             // hay npe cuando la funcion es un solo argumento
         }
@@ -843,8 +841,18 @@ public class PythonTranspiler implements Java8ParserListener {
             // hay npe cuando la funcion no tiene argumentos
         }
 
+        boolean isStatic = false;
+        for (Java8Parser.MethodModifierContext mod : ctx.methodModifier()) {
+            if (mod.getText().contains("static"))
+                isStatic = true;
+        }
+
         String funParams = String.join(", ", paramNames);
-        String funDcl = String.format("def %s(self, %s):", funName, funParams);
+        String funDcl;
+        if (isStatic)
+            funDcl = String.format("def %s(%s):", funName, funParams);
+        else
+            funDcl = String.format("def %s(self, %s):", funName, funParams);
         appendln(funDcl);
     }
 
@@ -1468,7 +1476,6 @@ public class PythonTranspiler implements Java8ParserListener {
                 value = getInitValue(type);
             }
             appendln(String.format("%s = %s", identifier, value));
-
         }
     }
 
@@ -2137,12 +2144,23 @@ public class PythonTranspiler implements Java8ParserListener {
             // se trata de una funcion sin argumentos
             args = "";
         }
+
+        // convertir el llamado de la funcion
         if (ctx.getText().contains("System.out.println")) {
             appendln(String.format("print(%s)", args));
             return;
         } else {
-            String methodName = ctx.methodName().getText();
-            appendln(String.format("self.%s(%s)", methodName, args));
+            if (ctx.methodName() == null) {
+                // sucede cuando el llamado no se hace directamente a traves del idenetificador del metodo como en
+                // 'nombreDelMetodo(argumento, otro)' sino que se realiza a traves de una instancia como en
+                // 'unaInstancia.nombreDelMetodo(argumento, otro)'
+                String objName = ctx.typeName().getText();
+                String methodName = ctx.Identifier().getText();
+                appendln(String.format("%s.%s(%s)", objName, methodName, args));
+            } else {
+                String methodName = ctx.methodName().getText();
+                appendln(String.format("self.%s(%s)", methodName, args));
+            }
         }
 
     }

@@ -7,6 +7,14 @@ El codigo fuente en Java se supone que tiene las siguientes características:
         * El tema de invocación de métodos es más sencillo
     - Todos los metodos de la fuente en Java deben ser estáticos
 
+En codigos de fuente sencillos de Java se debe instanciar la clase principal dentro del
+método estático principal `main()` para poder ejecutar el programa y no abusar de los 
+métodos estáticos y conservar métodos y atributos de instancia sin la necesidad de la 
+verbosidad de la palabra `static` cada vez que se define un identificador.
+
+# Caracteristicas
+El transpilador hace distincion entre los métodos que son estáticos y los que no
+
 # Estructura
 El atributo de clase estático `tabDepth` controla la identación a medida que se procesa
 el codigo fuente de java. Es un entero que se incrementa o decrementa a través
