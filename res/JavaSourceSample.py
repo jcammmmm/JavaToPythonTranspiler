@@ -21,6 +21,14 @@ class JavaSourceSample:
     print(s)
     print(n)
 
+  def whileLoop(self):
+    print("Test para 'while':")
+    i = 2
+    while i<10:
+      print(i)
+      self.forLoop()
+      i=i+1
+
   def forLoop(self):
     i = 2
     while i<500 and i%1==0:
@@ -43,8 +51,13 @@ class JavaSourceSample:
     print("Hello world!")
     j = JavaSourceSample()
     j.show(3, "algo", args)
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     j.forLoop()
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     j.instanceFun()
+    print("------------------------------")
+    j.whileLoop()
+    print("------------------------------")
     JavaSourceSample.staticFun()
 
 import sys
