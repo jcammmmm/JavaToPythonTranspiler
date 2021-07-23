@@ -1859,7 +1859,9 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterWhileStatement(Java8Parser.WhileStatementContext ctx) {
-
+        String whileExpr = ctx.expression().getText();
+        String whileDcl = String.format("while %s:", whileExpr);
+        appendln(whileDcl);
     }
 
     @Override
@@ -1965,12 +1967,15 @@ public class PythonTranspiler implements Java8ParserListener {
         // Saber si el incremento o decremeto es pre o post no interesa porque la instruccion siempre se ejecuta al
         // final tanto en el for original como en el while traducido. Por lo tanto no conviente hacer la verificacion.
         String updateSmnt = ctx.forUpdate().getText();
+        // lo que hago es coger el incremento del for:
+        // for (;; i++)
+        // for (;; i = i + 2)
         if (updateSmnt.contains("++")) {
             String varName = updateSmnt.replace("+", "");
             updateSmnt = varName + "+= 1";
         } else if (updateSmnt.contains("--")) {
             String varName = updateSmnt.replace("-", "");
-            updateSmnt = varName + "*= 1";
+            updateSmnt = varName + "-= 1";
         }
         appendln(updateSmnt);
         appendln("");
@@ -2602,7 +2607,12 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterAssignment(Java8Parser.AssignmentContext ctx) {
-
+        if (hasParent(ctx, "WhileStatementContext")) {
+            // se pasa directo porque se experan expresiones sensillas
+            appendln(ctx.getText());
+        } else {
+            // no hago nado poque no se de donde vengo
+        }
     }
 
     @Override

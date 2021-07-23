@@ -8,6 +8,7 @@ El codigo fuente en Java se supone que tiene las siguientes características:
 - El uso de los corchetes para delimitar bloques es obligatorio. Esto puede afectar
   la identacion del codigo fuente en algunos casos. Por ejemplo en `for (i = 0; i < 2; i++) print(i)` 
 - (Soportado!) Todos los metodos de la fuente en Java deben ser estáticos   
+- Expresiones i++ no se soportan.
 
 ### Ciclos
 - Solo se admiten expresiones booleanas dentro de la condicion de terminacion

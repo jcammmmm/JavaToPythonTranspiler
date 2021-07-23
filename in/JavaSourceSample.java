@@ -23,6 +23,16 @@ public class JavaSourceSample {
         return "";
     }
 
+    public void whileLoop() {
+        System.out.println("Test para 'while':");
+        int i = 2;
+        while (i < 10) {
+            System.out.println(i);
+            forLoop();
+            i = i + 1;
+        }
+    }
+
     public void forLoop() {
         for (int i = 2; i < 500 && i%1==0; i = i*i) {
             System.out.println(i/2);
@@ -42,9 +52,13 @@ public class JavaSourceSample {
 
         JavaSourceSample j = new JavaSourceSample();
         j.show(3, "algo", args);
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         j.forLoop();
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         j.instanceFun();
-
+        System.out.println("------------------------------");
+        j.whileLoop();
+        System.out.println("------------------------------");
         staticFun();
     }
 }
