@@ -21,6 +21,17 @@ class JavaSourceSample:
     print(s)
     print(n)
 
+  def ifStatement(self):
+    temperatura = 24
+    if (temperatura>25):
+      print("A la playa!!!")
+    if (temperatura<=25):
+      print("Esperando al buen tiempo...")
+    if (temperatura>25):
+      print("A la playa!!!")
+    else:
+      print("Esperando al buen tiempo...")
+
   def whileLoop(self):
     print("Test para 'while':")
     i = 2

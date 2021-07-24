@@ -23,6 +23,23 @@ public class JavaSourceSample {
         return "";
     }
 
+    public void ifStatement() {
+        int temperatura = 24;
+
+        if (temperatura > 25) {
+            System.out.println("A la playa!!!");
+        }
+
+        if (temperatura <= 25) {
+            System.out.println("Esperando al buen tiempo...");
+        }
+        if (temperatura > 25) {
+            System.out.println("A la playa!!!");
+        } else {
+            System.out.println("Esperando al buen tiempo...");
+        }
+    }
+
     public void whileLoop() {
         System.out.println("Test para 'while':");
         int i = 2;
