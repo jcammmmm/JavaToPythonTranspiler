@@ -19,6 +19,7 @@ public class PythonTranspiler implements Java8ParserListener {
     private String compilationUnitName;         // nombre del archivo Java
     private int tabDepth;                       // profundidad de la identacion
     private Stack<Integer> switchState = new Stack<>(); // 0 = initial if, 1 = elif, 2 = else
+    private boolean scannerWasDeclared = false;
 
     // control de codigo fuente de salida
     private final StringBuilder transpiledSource;
@@ -1650,6 +1651,12 @@ public class PythonTranspiler implements Java8ParserListener {
             // Esta condicion se deja para no imprimir nada, pues es una declaracion y el parser
             // coje por aqui.
         }
+        else if (ctx.getText().contains("newScanner(")) {
+            // Quiere decir que se ha declarado un objeto para leer, así que se deja la variable indicadora de entrada
+            // en activa para no confundir con cualquier otro llamado de funcion. No se traduce porque en python
+            // no es necesario declarar un objeto para leer desde la entrada estandar.
+            scannerWasDeclared = true;
+        }
         else {
             String type = ctx.unannType().getText();
             // se hace ciclo para declaraciones de la forma:
@@ -1663,6 +1670,8 @@ public class PythonTranspiler implements Java8ParserListener {
                     value = variableDeclarator.variableInitializer().getText();
                     if (value.contains("new"))
                         value = value.substring(3);
+                    else if (scannerWasDeclared && (value.contains(".nextLine") || value.contains(".nextInt") || value.contains(".nextDouble") || value.contains(".nextFloat")))
+                        value = "input()";
                 } catch (NullPointerException npe) {
                     // este caso sucede cuando no se declara la variable y no se inicializa.
                     value = getInitValue(type);
@@ -2437,7 +2446,6 @@ public class PythonTranspiler implements Java8ParserListener {
             }
             appendln(methodInvocationExpr);
         }
-
     }
 
     @Override

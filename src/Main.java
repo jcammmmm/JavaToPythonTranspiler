@@ -12,7 +12,8 @@ public class Main {
             transpilePsicodeSource("../in/t42.psi");
         else {
             String[] samples = {
-                "in/JavaSourceSample.java"
+                // "in/JavaSourceSample.java",
+                "in/Sample2.java"
             };
             for (String filename : samples) {
                 System.out.println("#######################################################");
