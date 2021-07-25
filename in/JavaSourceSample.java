@@ -66,37 +66,58 @@ public class JavaSourceSample {
         }
     }
 
-//    public void switch() {
-//        int day = 5;
-//        String dayString;
-//        switch (day) {
-//            case 1:
-//                dayString = "Lunes";
-//                break;
-//            case 2:
-//                dayString = "Martes";
-//                break;
-//            case 3:
-//                dayString = "Miercoles";
-//                break;
-//            case 4:
-//                dayString = "Jueves";
-//                break;
-//            case 5:
-//                dayString = "Viernes";
-//                break;
-//            case 6:
-//                dayString = "Sabado";
-//                break;
-//            case 7:
-//                dayString = "Domingo";
-//                break;
-//            default:
-//                dayString = "Dia inválido";
-//                break;
-//        }
-//        System.out.println(dayString);
-//    }
+    public void switchExample() {
+        int day = 5;
+        String dayString;
+        switch (day) {
+            case 1:
+                switch (day) {
+                    case 1:
+                        dayString = "Lunes";
+                        break;
+                    case 2:
+                        dayString = "2";
+                        break;
+                    default:
+                        dayString = "3";
+                        break;
+                }
+                break;
+            case 2:
+                dayString = "Martes";
+                break;
+            case 3:
+                dayString = "Miercoles";
+                break;
+            case 4:
+                dayString = "Jueves";
+                break;
+            case 5:
+                dayString = "Viernes";
+                break;
+            case 6:
+                dayString = "Sabado";
+                break;
+            case 7:
+                dayString = "Domingo";
+                break;
+            default:
+                dayString = "Dia inválido";
+                break;
+        }
+        switch (day) {
+            case 1:
+                dayString = "1";
+                break;
+            case 2:
+                dayString = "2";
+                break;
+            default:
+                dayString = "3";
+                break;
+        }
+        System.out.println(dayString);
+    }
 
     public void forLoop() {
         for (int i = 2; i < 500 && i%1==0; i = i*i) {

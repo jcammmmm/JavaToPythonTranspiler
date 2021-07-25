@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class PythonTranspiler implements Java8ParserListener {
@@ -20,6 +21,7 @@ public class PythonTranspiler implements Java8ParserListener {
     private int tabDepth;                       // profundidad de la identacion
     private Stack<Integer> switchState = new Stack<>(); // 0 = initial if, 1 = elif, 2 = else
     private boolean scannerWasDeclared = false;
+    private Stack<String> switchVariable= new Stack<>();
 
     // control de codigo fuente de salida
     private final StringBuilder transpiledSource;
@@ -30,6 +32,7 @@ public class PythonTranspiler implements Java8ParserListener {
     private Map<String, String> instanceVariables;
     private Set<String> classMethods;
     private Set<String> instanceMethods;
+
 
     /**
      * Para no tener que estar escribiendo System.out.println(o.toString())
@@ -1606,6 +1609,7 @@ public class PythonTranspiler implements Java8ParserListener {
         // Si el bloque esta vacio...
         if (ctx.blockStatements() == null)
             appendln("pass");
+
     }
 
     @Override
@@ -1616,11 +1620,21 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterBlockStatements(Java8Parser.BlockStatementsContext ctx) {
+        if (ctx.getParent().getClass().getName() == "Java8Parser$SwitchBlockStatementGroupContext"){
+            //appendln();
+            tabDepth++;
+        } else {
 
+        }
     }
 
     @Override
     public void exitBlockStatements(Java8Parser.BlockStatementsContext ctx) {
+        if (ctx.getParent().getClass().getName() == "Java8Parser$SwitchBlockStatementGroupContext"){
+            tabDepth--;
+        } else {
+
+        }
     }
 
     @Override
@@ -1748,7 +1762,17 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterExpressionStatement(Java8Parser.ExpressionStatementContext ctx) {
-
+        if (hasParent(ctx, "SwitchBlockContext")) {
+            //Para expresiones en switch, falta pulir pero por ahora todo bien
+            String switchExpression = ctx.getText();
+            char lastChar = switchExpression.charAt(switchExpression.length() - 1);
+            if(lastChar==';'){
+                switchExpression = switchExpression.substring(0, switchExpression.length() - 1);
+            }
+            appendln(switchExpression);
+        } else {
+            //
+        }
     }
 
     @Override
@@ -1823,7 +1847,8 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterSwitchStatement(Java8Parser.SwitchStatementContext ctx) {
-
+        switchVariable.push(ctx.expression().getText());
+        switchState.push(0);
     }
 
     @Override
@@ -1863,7 +1888,26 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterSwitchLabel(Java8Parser.SwitchLabelContext ctx) {
-
+        String caseDefault = ctx.getChild(0).getText().split(" ")[0];
+        int actualState = switchState.peek();
+        if (caseDefault.equals("case")){
+            if (actualState == 0){
+                String value = ctx.getChild(1).getText();
+                String switchLab = String.format("if (%s == %s):", switchVariable.peek(),value);
+                switchState.pop();
+                switchState.push(1);
+                appendln(switchLab);
+            } else{
+                String value = ctx.getChild(1).getText();
+                String switchLab = String.format("elif (%s == %s):", switchVariable.peek(),value);
+                appendln(switchLab);
+            }
+        }else if (caseDefault.equals("default")){
+            String value = ctx.getChild(1).getText();
+            String switchLab = String.format("else:", switchVariable.pop(),value);
+            switchState.pop();
+            appendln(switchLab);
+        }
     }
 
     @Override
@@ -2068,7 +2112,12 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterBreakStatement(Java8Parser.BreakStatementContext ctx) {
-
+        //Estaba vacío, pongo el condicional para que en caso de que alguien lo use, para switch debe ignorarse el break;
+        if (hasParent(ctx, "SwitchBlockContext")){
+            //
+        } else {
+            //
+        }
     }
 
     @Override

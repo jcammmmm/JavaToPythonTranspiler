@@ -55,6 +55,38 @@ class JavaSourceSample:
       self.forLoop()
       i=i+1
 
+  def switchExample(self):
+    day = 5
+    dayString = ''
+    if (day == 1):
+      if (day == 1):
+        dayString="Lunes"
+      elif (day == 2):
+        dayString="2"
+      else:
+        dayString="3"
+    elif (day == 2):
+      dayString="Martes"
+    elif (day == 3):
+      dayString="Miercoles"
+    elif (day == 4):
+      dayString="Jueves"
+    elif (day == 5):
+      dayString="Viernes"
+    elif (day == 6):
+      dayString="Sabado"
+    elif (day == 7):
+      dayString="Domingo"
+    else:
+      dayString="Dia inválido"
+    if (day == 1):
+      dayString="1"
+    elif (day == 2):
+      dayString="2"
+    else:
+      dayString="3"
+    print(dayString)
+
   def forLoop(self):
     i = 2
     while i<500 and i%1==0:
