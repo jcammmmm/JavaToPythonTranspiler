@@ -57,7 +57,9 @@ class JavaSourceSample:
 
   def switchExample(self):
     day = 5
+    day2 = 2
     dayString = ''
+    dayString2 = ''
     if (day == 1):
       if (day == 1):
         dayString="Lunes"
@@ -79,13 +81,14 @@ class JavaSourceSample:
       dayString="Domingo"
     else:
       dayString="Dia inválido"
-    if (day == 1):
-      dayString="1"
-    elif (day == 2):
-      dayString="2"
+    if (day2 == 1):
+      dayString2="1"
+    elif (day2 == 2):
+      dayString2="2"
     else:
-      dayString="3"
+      dayString2="3"
     print(dayString)
+    print(dayString2)
 
   def forLoop(self):
     i = 2

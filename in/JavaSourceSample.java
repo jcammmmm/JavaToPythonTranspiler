@@ -68,7 +68,9 @@ public class JavaSourceSample {
 
     public void switchExample() {
         int day = 5;
+        int day2 = 2;
         String dayString;
+        String dayString2;
         switch (day) {
             case 1:
                 switch (day) {
@@ -105,18 +107,19 @@ public class JavaSourceSample {
                 dayString = "Dia inválido";
                 break;
         }
-        switch (day) {
+        switch (day2) {
             case 1:
-                dayString = "1";
+                dayString2 = "1";
                 break;
             case 2:
-                dayString = "2";
+                dayString2 = "2";
                 break;
             default:
-                dayString = "3";
+                dayString2 = "3";
                 break;
         }
         System.out.println(dayString);
+        System.out.println(dayString2);
     }
 
     public void forLoop() {
