@@ -25,6 +25,8 @@ public class JavaSourceSample {
 
     public void ifStatement() {
         int temperatura = 24;
+        boolean condicion1 = true;
+        boolean condicion2 = false;
 
         if (temperatura > 25) {
             System.out.println("A la playa!!!");
@@ -38,6 +40,20 @@ public class JavaSourceSample {
         } else {
             System.out.println("Esperando al buen tiempo...");
         }
+
+        if (condicion1) {
+            System.out.println("A");
+        } else if (condicion2) {
+            System.out.println("B");
+        } else if (condicion2) {
+            if (temperatura > 25) {
+                System.out.println("A la playa!!!");
+            } else {
+                System.out.println("Esperando al buen tiempo...");
+            }
+        } else {
+            System.out.println("D");
+        }
     }
 
     public void whileLoop() {
@@ -49,6 +65,38 @@ public class JavaSourceSample {
             i = i + 1;
         }
     }
+
+//    public void switch() {
+//        int day = 5;
+//        String dayString;
+//        switch (day) {
+//            case 1:
+//                dayString = "Lunes";
+//                break;
+//            case 2:
+//                dayString = "Martes";
+//                break;
+//            case 3:
+//                dayString = "Miercoles";
+//                break;
+//            case 4:
+//                dayString = "Jueves";
+//                break;
+//            case 5:
+//                dayString = "Viernes";
+//                break;
+//            case 6:
+//                dayString = "Sabado";
+//                break;
+//            case 7:
+//                dayString = "Domingo";
+//                break;
+//            default:
+//                dayString = "Dia inválido";
+//                break;
+//        }
+//        System.out.println(dayString);
+//    }
 
     public void forLoop() {
         for (int i = 2; i < 500 && i%1==0; i = i*i) {

@@ -1703,12 +1703,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void exitStatementNoShortIf(Java8Parser.StatementNoShortIfContext ctx) {
-        String ifElseParent = ctx.getParent().getClass().getName();
-        if (ifElseParent == "Java8Parser$IfThenElseStatementContext" || ifElseParent == "Java8Parser$IfThenElseStatementNoShortIfContext"){
-            appendln("else:");
-        } else {
-            // otros casos
-        }
+        appendln("else:");
     }
 
     @Override
@@ -1785,14 +1780,23 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterIfThenElseStatement(Java8Parser.IfThenElseStatementContext ctx) {
+        boolean noShortIfParent = hasParent(ctx, "StatementContext");
+
+        if (noShortIfParent) {
+            tabDepth++;
+        }
         String ifExpr = ctx.expression().getText();
         String ifDcl = String.format("if (%s):", ifExpr);
         appendln(ifDcl);
+
     }
 
     @Override
     public void exitIfThenElseStatement(Java8Parser.IfThenElseStatementContext ctx) {
-
+        boolean noShortIfParent = hasParent(ctx, "StatementContext");
+        if (noShortIfParent) {
+            tabDepth--;
+        }
     }
 
     @Override
