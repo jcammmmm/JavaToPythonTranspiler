@@ -33,23 +33,23 @@ class JavaSourceSample:
       print("A la playa!!!")
     if (temperatura<=25):
       print("Esperando al buen tiempo...")
-    if (temperatura>25):
-      print("A la playa!!!")
-    else:
-      print("Esperando al buen tiempo...")
-    if (condicion1):
-      print("A")
-    else:
-      if (condicion2):
-        print("B")
+      if (temperatura>25):
+        print("A la playa!!!")
+      else:
+        print("Esperando al buen tiempo...")
+      if (condicion1):
+        print("A")
       else:
         if (condicion2):
-            if (temperatura>25):
-              print("A la playa!!!")
-            else:
-              print("Esperando al buen tiempo...")
+          print("B")
         else:
-          print("D")
+          if (condicion2):
+              if (temperatura>25):
+                print("A la playa!!!")
+              else:
+                print("Esperando al buen tiempo...")
+          else:
+            print("D")
 
   def switchExample(self):
     day = 5
@@ -112,7 +112,7 @@ class JavaSourceSample:
     j = 12
     j = 2
     while not (j>30):
-      print(j)
+      print('{}{}'.format("El nuevo valor es: ", j))
       j=j*j
       
     k = 2

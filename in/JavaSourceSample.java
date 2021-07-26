@@ -146,7 +146,7 @@ public class JavaSourceSample {
 
         int j = 12;
         for (j = 2; !(j > 30); j = j*j) {
-            System.out.println(j);
+            System.out.println("El nuevo valor es: " + j);
         }
 
         int k = 2;

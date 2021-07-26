@@ -142,13 +142,13 @@ public class PythonTranspiler implements Java8ParserListener {
      */
     public boolean hasParent(ParserRuleContext startCtx, String parentContextName) {
         // impl.
-        ParserRuleContext currCtx = startCtx.getParent();
+        ParserRuleContext currCtx = startCtx;
         boolean parentFound = false;
         try {
+            String parentGoal = "Java8Parser$" + parentContextName;
             while (true) {
-                String parentGoal = "Java8Parser$" + parentContextName;
                 currCtx = currCtx.getParent();
-                String currParent = currCtx.getParent().getClass().getName();
+                String currParent = currCtx.getClass().getName();
                 if (currParent.equals(parentGoal)) {
                     parentFound = true;
                     break;
@@ -1685,7 +1685,7 @@ public class PythonTranspiler implements Java8ParserListener {
     @Override
     public void enterLocalVariableDeclaration(Java8Parser.LocalVariableDeclarationContext ctx) {
         // impl.
-        if (hasParent(ctx, "ForStatementContext")) {
+        if (hasParent(ctx, "ForInitContext")) {
             // En el metodo 'basicForStatement' se maneja la variable principal de iteracion.
             // Esta condicion se deja para no imprimir nada, pues es una declaracion y el parser
             // coje por aqui.
