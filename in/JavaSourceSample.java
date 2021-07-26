@@ -134,7 +134,7 @@ public class JavaSourceSample {
         System.out.println("Test para 'doWhile':");
         int i = 1;
         do {
-            System.out.println(i);
+            System.out.println("iteracion: " + i);
             i = i + 1;
         } while(i <= 3);
     }
@@ -154,8 +154,8 @@ public class JavaSourceSample {
     }
 
     public static void main(String[] args) {
-        System.out.println("Hello world!");
-
+        String demo = "Hello: " + 1 + ", World: " + 2;
+        System.out.println(demo);
         JavaSourceSample j = new JavaSourceSample();
         j.show(3, "algo", args);
         System.out.println("------------------------------");

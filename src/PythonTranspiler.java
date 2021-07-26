@@ -1,13 +1,7 @@
-import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class PythonTranspiler implements Java8ParserListener {
@@ -267,6 +261,32 @@ public class PythonTranspiler implements Java8ParserListener {
         src = src.replaceAll(">  =", ">=").trim(); // fix para el operador
         src = src.replaceAll("<  =", "<=").trim(); // fix para el operador
         return src;
+    }
+
+    /**
+     * Recibe una expresion y chequea si es una concatenacion de strings para realizar la
+     * traduccion a una concatenacion de strings valida en python.
+     * @param expr
+     * @return
+     */
+    private String translateStringConcat(String expr) {
+        if (isValidForConcatTranslation(expr)) {
+            // si la expresion tiene cadena texto y un '+' se supone concatenacion
+            StringBuilder builder = new StringBuilder("'");
+            String[] ops = expr.split("\\+");
+            builder.append("{}".repeat(ops.length));
+            builder.append("'.format(");
+            builder.append(String.join(", ", ops));
+            builder.append(")");
+            return builder.toString();
+        } else {
+            // si hay un '+' dentro del string no se puede aplicar el procesamiento
+            return expr;
+        }
+    }
+
+    private static boolean isValidForConcatTranslation(String expr) {
+        return !expr.matches("\".*\\+.*\"") && (expr.contains("\"") && expr.contains("+"));
     }
 
     @Override
@@ -1624,6 +1644,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterBlockStatements(Java8Parser.BlockStatementsContext ctx) {
+        // impl.
         if (ctx.getParent().getClass().getName() == "Java8Parser$SwitchBlockStatementGroupContext"){
             //appendln();
             tabDepth++;
@@ -1691,7 +1712,7 @@ public class PythonTranspiler implements Java8ParserListener {
                     else if (scannerWasDeclared && (value.contains(".nextLine") || value.contains(".nextInt") || value.contains(".nextDouble") || value.contains(".nextFloat")))
                         value = "input()";
                     else
-                        value = replaceBooleanOps(value);
+                        value = translateStringConcat(replaceBooleanOps(value));
                 } catch (NullPointerException npe) {
                     // este caso sucede cuando no se declara la variable y no se inicializa.
                     value = getInitValue(type);
@@ -1723,6 +1744,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void exitStatementNoShortIf(Java8Parser.StatementNoShortIfContext ctx) {
+        // impl.
         appendln("else:");
     }
 
@@ -1768,6 +1790,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterExpressionStatement(Java8Parser.ExpressionStatementContext ctx) {
+        // impl.
         if (hasParent(ctx, "SwitchBlockContext")) {
             //Para expresiones en switch, falta pulir pero por ahora todo bien
             String switchExpression = ctx.getText();
@@ -1798,6 +1821,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterIfThenStatement(Java8Parser.IfThenStatementContext ctx) {
+        // impl.
         String ifExpr = ctx.expression().getText();
         String ifDcl = String.format("if (%s):", ifExpr);
         appendln(ifDcl);
@@ -1810,6 +1834,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterIfThenElseStatement(Java8Parser.IfThenElseStatementContext ctx) {
+        // impl.
         boolean noShortIfParent = hasParent(ctx, "StatementContext");
 
         if (noShortIfParent) {
@@ -1823,6 +1848,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void exitIfThenElseStatement(Java8Parser.IfThenElseStatementContext ctx) {
+        // impl.
         boolean noShortIfParent = hasParent(ctx, "StatementContext");
         if (noShortIfParent) {
             tabDepth--;
@@ -1831,6 +1857,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterIfThenElseStatementNoShortIf(Java8Parser.IfThenElseStatementNoShortIfContext ctx) {
+        // impl.
         String ifExpr = ctx.expression().getText();
         String ifDcl = String.format("if (%s):", ifExpr);
         appendln(ifDcl);
@@ -2501,6 +2528,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
         // convertir el llamado de la funcion
         if (ctx.getText().contains("System.out.println")) {
+            args = translateStringConcat(args);
             appendln(String.format("print(%s)", args));
             return;
         } else {

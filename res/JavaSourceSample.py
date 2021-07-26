@@ -98,7 +98,7 @@ class JavaSourceSample:
     print("Test para 'doWhile':")
     i = 1
     while True:
-      print(i)
+      print('{}{}'.format("iteracion: ", i))
       i = i+1
       if not i<=3:
         break
@@ -122,7 +122,8 @@ class JavaSourceSample:
       
 
   def main(args):
-    print("Hello world!")
+    demo = '{}{}{}{}'.format("Hello: ", 1, ", World: ", 2)
+    print(demo)
     j = JavaSourceSample()
     j.show(3, "algo", args)
     print("------------------------------")

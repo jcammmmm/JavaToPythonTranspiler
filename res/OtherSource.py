@@ -5,8 +5,8 @@ class OtherSource:
 
   def main(args):
     os = OtherSource()
-    a = False
-    b = True
+    demo = '{}{}{}{}'.format("uno: ", 1, "; dos: ", 2)
+    print(demo)
 
 import sys
 if __name__ == '__main__':
