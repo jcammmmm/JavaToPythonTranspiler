@@ -176,6 +176,8 @@ public class PythonTranspiler implements Java8ParserListener {
         boolExpr = boolExpr.replace("||", " or ");
         boolExpr = boolExpr.replace("&&", " and ");
         boolExpr = boolExpr.replace("!", " not ");
+        boolExpr = boolExpr.replace("true", " True ");
+        boolExpr = boolExpr.replace("false", " False ");
         return fixBloatSpaces(boolExpr);
     }
 
@@ -227,6 +229,8 @@ public class PythonTranspiler implements Java8ParserListener {
         tabDepth++; // identacion para el cuerpo
         for (Map.Entry<String, String> varDcl : instanceVariables.entrySet())
             constructorDcl.append(String.format("%sself.%s = %s", TAB.repeat(tabDepth), varDcl.getKey(), varDcl.getKey()));
+        if (instanceVariables.isEmpty())
+            constructorDcl.append(String.format("%spass", TAB.repeat(tabDepth)));
         constructorDcl.append("\n");
         tabDepth--;
         tabDepth--;
@@ -1686,6 +1690,8 @@ public class PythonTranspiler implements Java8ParserListener {
                         value = value.substring(3);
                     else if (scannerWasDeclared && (value.contains(".nextLine") || value.contains(".nextInt") || value.contains(".nextDouble") || value.contains(".nextFloat")))
                         value = "input()";
+                    else
+                        value = replaceBooleanOps(value);
                 } catch (NullPointerException npe) {
                     // este caso sucede cuando no se declara la variable y no se inicializa.
                     value = getInitValue(type);
@@ -1949,12 +1955,20 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterDoStatement(Java8Parser.DoStatementContext ctx) {
-
+        // impl.
+        appendln("while True:");
     }
 
     @Override
     public void exitDoStatement(Java8Parser.DoStatementContext ctx) {
-
+        // impl.
+        tabDepth++;
+        String endCondition = ctx.expression().getText();
+        appendln(String.format("if not %s:", endCondition));
+        tabDepth++;
+        appendln("break");
+        tabDepth--;
+        tabDepth--;
     }
 
     @Override
@@ -2679,9 +2693,11 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterAssignment(Java8Parser.AssignmentContext ctx) {
-        if (hasParent(ctx, "WhileStatementContext")) {
-            // se pasa directo porque se experan expresiones sencillas
-            appendln(ctx.getText());
+        // impl.
+        boolean fromWhile = hasParent(ctx, "WhileStatementContext");
+        boolean fromDoWhile = hasParent(ctx, "DoStatementContext");
+        if (fromDoWhile || fromWhile) {
+            appendln(replaceBooleanOps(ctx.getText()));
         } else {
             // no hago nado poque no se de donde vengo
         }

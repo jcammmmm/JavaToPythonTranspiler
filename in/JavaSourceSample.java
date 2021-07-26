@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class JavaSourceSample {
 
     public static String crossVariable;
@@ -10,6 +12,12 @@ public class JavaSourceSample {
 
     public static void staticFun() {
         System.out.println(obsFactor);
+    }
+
+    public static void read() {
+        Scanner input = new Scanner(System.in);
+        String data = input.nextLine();
+        System.out.println(data);
     }
 
     public String show(Integer j, String smthg, Object o) {
@@ -53,16 +61,6 @@ public class JavaSourceSample {
             }
         } else {
             System.out.println("D");
-        }
-    }
-
-    public void whileLoop() {
-        System.out.println("Test para 'while':");
-        int i = 2;
-        while (i < 10) {
-            System.out.println(i);
-            forLoop();
-            i = i + 1;
         }
     }
 
@@ -122,6 +120,25 @@ public class JavaSourceSample {
         System.out.println(dayString2);
     }
 
+    public void whileLoop() {
+        System.out.println("Test para 'while':");
+        int i = 2;
+        while (i < 10) {
+            System.out.println(i);
+            forLoop();
+            i = i + 1;
+        }
+    }
+
+    public void doWhileLoop() {
+        System.out.println("Test para 'doWhile':");
+        int i = 1;
+        do {
+            System.out.println(i);
+            i = i + 1;
+        } while(i <= 3);
+    }
+
     public void forLoop() {
         for (int i = 2; i < 500 && i%1==0; i = i*i) {
             System.out.println(i/2);
@@ -141,13 +158,21 @@ public class JavaSourceSample {
 
         JavaSourceSample j = new JavaSourceSample();
         j.show(3, "algo", args);
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("------------------------------");
         j.forLoop();
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("..............................");
         j.instanceFun();
         System.out.println("------------------------------");
         j.whileLoop();
-        System.out.println("------------------------------");
+        System.out.println("..............................");
         staticFun();
+        System.out.println("------------------------------");
+        j.switchExample();
+        System.out.println("..............................");
+        j.ifStatement();
+        System.out.println("------------------------------");
+        j.doWhileLoop();
+        System.out.println("..............................");
+        read();
     }
 }

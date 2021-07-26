@@ -13,7 +13,8 @@ public class Main {
         else {
             String[] samples = {
                 "in/JavaSourceSample.java",
-                "in/Sample2.java"
+                // "in/Sample2.java",
+                // "in/OtherSource.java"
             };
             for (String filename : samples) {
                 System.out.println("#######################################################");

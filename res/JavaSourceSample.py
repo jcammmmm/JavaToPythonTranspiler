@@ -11,6 +11,10 @@ class JavaSourceSample:
   def staticFun():
     print(JavaSourceSample.obsFactor)
 
+  def read():
+    data = input()
+    print(data)
+
   def show(self, j, smthg, o):
     x = 0
     d = 4.1
@@ -23,8 +27,8 @@ class JavaSourceSample:
 
   def ifStatement(self):
     temperatura = 24
-    condicion1 = true
-    condicion2 = false
+    condicion1 = True
+    condicion2 = False
     if (temperatura>25):
       print("A la playa!!!")
     if (temperatura<=25):
@@ -46,14 +50,6 @@ class JavaSourceSample:
               print("Esperando al buen tiempo...")
         else:
           print("D")
-
-  def whileLoop(self):
-    print("Test para 'while':")
-    i = 2
-    while i<10:
-      print(i)
-      self.forLoop()
-      i=i+1
 
   def switchExample(self):
     day = 5
@@ -90,6 +86,23 @@ class JavaSourceSample:
     print(dayString)
     print(dayString2)
 
+  def whileLoop(self):
+    print("Test para 'while':")
+    i = 2
+    while i<10:
+      print(i)
+      self.forLoop()
+      i = i+1
+
+  def doWhileLoop(self):
+    print("Test para 'doWhile':")
+    i = 1
+    while True:
+      print(i)
+      i = i+1
+      if not i<=3:
+        break
+
   def forLoop(self):
     i = 2
     while i<500 and i%1==0:
@@ -112,14 +125,22 @@ class JavaSourceSample:
     print("Hello world!")
     j = JavaSourceSample()
     j.show(3, "algo", args)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("------------------------------")
     j.forLoop()
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("..............................")
     j.instanceFun()
     print("------------------------------")
     j.whileLoop()
-    print("------------------------------")
+    print("..............................")
     JavaSourceSample.staticFun()
+    print("------------------------------")
+    j.switchExample()
+    print("..............................")
+    j.ifStatement()
+    print("------------------------------")
+    j.doWhileLoop()
+    print("..............................")
+    JavaSourceSample.read()
 
 import sys
 if __name__ == '__main__':

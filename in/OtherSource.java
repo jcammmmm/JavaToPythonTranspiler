@@ -1,7 +1,8 @@
 public class OtherSource {
+
     public static void main(String[] args) {
-        StringBuilder src = new StringBuilder("?staticFields");
-        src.ins
-        System.out.println(src);
+        OtherSource os = new OtherSource();
+        boolean a = false;
+        boolean b = true;
     }
 }

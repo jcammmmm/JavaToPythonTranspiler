@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class Sample2{
+public class Sample2 {
     public String txt = "unodostres";
 
     public static void main(String[] args) {
