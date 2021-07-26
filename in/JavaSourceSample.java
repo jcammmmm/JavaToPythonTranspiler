@@ -153,6 +153,17 @@ public class JavaSourceSample {
         for (; k < 10; k = k*k) {}
     }
 
+    public void tryStatement() {
+        try {
+            int numerador,  denominador,resultado;
+            System.out.println("digite el numerador");
+        } catch (Exception e) {
+            System.out.println("No se puede dividir por cero");
+        } finally {
+            System.out.println("Proceso finalizado");
+        }
+    }
+
     public static void main(String[] args) {
         String demo = "Hello: " + 1 + ", World: " + 2;
         System.out.println(demo);
@@ -174,5 +185,7 @@ public class JavaSourceSample {
         j.doWhileLoop();
         System.out.println("..............................");
         read();
+        System.out.println("------------------------------");
+        j.tryStatement();
     }
 }

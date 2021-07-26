@@ -27,6 +27,8 @@ public class PythonTranspiler implements Java8ParserListener {
     private Set<String> classMethods;
     private Set<String> instanceMethods;
 
+    private Map<String, String> exceptionMap = new HashMap<>();
+
 
     /**
      * Para no tener que estar escribiendo System.out.println(o.toString())
@@ -48,6 +50,17 @@ public class PythonTranspiler implements Java8ParserListener {
         instanceVariables = new HashMap<>();
         classMethods = new HashSet<>();
         instanceMethods = new HashSet<>();
+        exceptionMap = new HashMap<>();
+        exceptionMap.put("ArithmeticException","ArithmeticError");
+        exceptionMap.put("EOFException","EOFError");
+        /*
+        exceptionMap.put("FileNotFoundException","ZeroDivisionError");
+        exceptionMap.put("ClassNotFoundException","ZeroDivisionError");
+        exceptionMap.put("ArrayIndexOutOfBoundsException","ZeroDivisionError");
+        exceptionMap.put("NumberFormatException","ZeroDivisionError");
+        exceptionMap.put("NullPointerException","ZeroDivisionError");
+        exceptionMap.put("IOException","ZeroDivisionError");
+        */
         System.out.println("Transpiling this compilation unit (filename): " + filename);
     }
 
@@ -1688,7 +1701,7 @@ public class PythonTranspiler implements Java8ParserListener {
         if (hasParent(ctx, "ForInitContext")) {
             // En el metodo 'basicForStatement' se maneja la variable principal de iteracion.
             // Esta condicion se deja para no imprimir nada, pues es una declaracion y el parser
-            // coje por aqui.
+            // decide entrar por aqui.
         }
         else if (ctx.getText().contains("newScanner(")) {
             // Quiere decir que se ha declarado un objeto para leer, así que se deja la variable indicadora de entrada
@@ -2208,7 +2221,8 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterTryStatement(Java8Parser.TryStatementContext ctx) {
-
+        //impl.
+        appendln("try:");
     }
 
     @Override
@@ -2228,7 +2242,20 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterCatchClause(Java8Parser.CatchClauseContext ctx) {
-
+        //impl.
+        String exception = ctx.catchFormalParameter().catchType().getText();
+        if(exceptionMap.containsKey(exception)){
+            exception = exceptionMap.get(exception);
+        }
+        String id = ctx.catchFormalParameter().variableDeclaratorId().getText();
+        String except;
+        if (exception.equals("Exception")){
+            except = String.format("except:");
+        }else{
+            except = String.format("except "+exception+" as "+ id+" :");
+        }
+        appendln(except);
+        //appendln("except %s:", exception);
     }
 
     @Override
@@ -2258,7 +2285,8 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterFinally_(Java8Parser.Finally_Context ctx) {
-
+        //impl.
+        appendln("finally:");
     }
 
     @Override

@@ -1,4 +1,4 @@
-// Generated from C:/Users/jcam/Data/repo-m/javaToPython/gmr\Java8Lexer.g4 by ANTLR 4.9.1
+// Generated from C:/Users/Lenovo/OneDrive/Documents/Universidad/JavaToPythonTranspiler/gmr\Java8Lexer.g4 by ANTLR 4.9.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

@@ -121,6 +121,17 @@ class JavaSourceSample:
       k=k*k
       
 
+  def tryStatement(self):
+    try:
+      numerador = 0
+      denominador = 0
+      resultado = 0
+      print("digite el numerador")
+    except:
+      print("No se puede dividir por cero")
+    finally:
+      print("Proceso finalizado")
+
   def main(args):
     demo = '{}{}{}{}'.format("Hello: ", 1, ", World: ", 2)
     print(demo)
@@ -142,6 +153,8 @@ class JavaSourceSample:
     j.doWhileLoop()
     print("..............................")
     JavaSourceSample.read()
+    print("------------------------------")
+    j.tryStatement()
 
 import sys
 if __name__ == '__main__':
