@@ -186,8 +186,11 @@ public class JavaSourceSample {
     public void tryStatement() {
         try {
             int numerador,  denominador,resultado;
-            System.out.println("digite el numerador");
-        } catch (Exception e) {
+            numerador=10;
+            denominador = 0;
+            resultado=numerador/denominador;
+            System.out.println(resultado);
+        } catch (ArithmeticException ae) {
             System.out.println("No se puede dividir por cero");
         } finally {
             System.out.println("Proceso finalizado");

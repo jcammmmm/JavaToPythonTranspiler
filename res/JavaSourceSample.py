@@ -145,8 +145,8 @@ class JavaSourceSample:
       numerador = 0
       denominador = 0
       resultado = 0
-      print("digite el numerador")
-    except:
+      print(resultado)
+    except ArithmeticError as ae :
       print("No se puede dividir por cero")
     finally:
       print("Proceso finalizado")
