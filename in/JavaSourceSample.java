@@ -64,7 +64,6 @@ public class JavaSourceSample {
         }
     }
 
-
     public void whileLoop() {
         System.out.println("Test para 'while':");
         int i = 2;
@@ -88,6 +87,21 @@ public class JavaSourceSample {
             System.out.println("iteracion: " + i);
             i = i + 1;
         } while(i <= 3);
+    }
+
+
+    public void forLoop() {
+        for (int i = 2; i < 500 && i%1==0; i = i*i) {
+            System.out.println(i/2);
+        }
+
+        int j = 12;
+        for (j = 2; !(j > 30); j = j*j) {
+            System.out.println("El nuevo valor es: " + j);
+        }
+
+        int k = 2;
+        for (; k < 10; k = k*k) {}
     }
 
     public void switchExample() {
@@ -144,23 +158,6 @@ public class JavaSourceSample {
         }
         System.out.println(dayString);
         System.out.println(dayString2);
-    }
-
-
-
-
-    public void forLoop() {
-        for (int i = 2; i < 500 && i%1==0; i = i*i) {
-            System.out.println(i/2);
-        }
-
-        int j = 12;
-        for (j = 2; !(j > 30); j = j*j) {
-            System.out.println("El nuevo valor es: " + j);
-        }
-
-        int k = 2;
-        for (; k < 10; k = k*k) {}
     }
 
     public void tryStatement() {

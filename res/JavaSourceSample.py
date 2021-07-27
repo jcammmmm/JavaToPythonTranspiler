@@ -73,6 +73,24 @@ class JavaSourceSample:
       if not i<=3:
         break
 
+  def forLoop(self):
+    i = 2
+    while i<500 and i%1==0:
+      print(i/2)
+      i=i*i
+      
+    j = 12
+    j = 2
+    while not (j>30):
+      print('{}{}'.format("El nuevo valor es: ", j))
+      j=j*j
+      
+    k = 2
+    while k<10:
+      pass
+      k=k*k
+      
+
   def switchExample(self):
     day = 5
     day2 = 2
@@ -107,24 +125,6 @@ class JavaSourceSample:
       dayString2="3"
     print(dayString)
     print(dayString2)
-
-  def forLoop(self):
-    i = 2
-    while i<500 and i%1==0:
-      print(i/2)
-      i=i*i
-      
-    j = 12
-    j = 2
-    while not (j>30):
-      print('{}{}'.format("El nuevo valor es: ", j))
-      j=j*j
-      
-    k = 2
-    while k<10:
-      pass
-      k=k*k
-      
 
   def tryStatement(self):
     try:
