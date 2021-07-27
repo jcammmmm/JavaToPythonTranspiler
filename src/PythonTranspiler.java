@@ -1730,8 +1730,6 @@ public class PythonTranspiler implements Java8ParserListener {
                     // este caso sucede cuando no se declara la variable y no se inicializa.
                     value = getInitValue(type);
                 }
-                value = value.replace("true", "True");
-                value = value.replace("false", "False");
                 appendln(String.format("%s = %s", identifier, value));
             }
         }
@@ -2590,8 +2588,6 @@ public class PythonTranspiler implements Java8ParserListener {
                     methodInvocationExpr = String.format("self.%s(%s)", methodName, args);
                 }
             }
-            methodInvocationExpr = methodInvocationExpr.replace("true", "True");
-            methodInvocationExpr = methodInvocationExpr.replace("false", "False");
             appendln(methodInvocationExpr);
         }
     }
@@ -2763,16 +2759,11 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterAssignment(Java8Parser.AssignmentContext ctx) {
-
         // impl.
         boolean fromWhile = hasParent(ctx, "WhileStatementContext");
         boolean fromDoWhile = hasParent(ctx, "DoStatementContext");
-        String inpAssignment = ctx.getText();
-        inpAssignment = inpAssignment.replace("true", "True");
-        inpAssignment = inpAssignment.replace("false", "False");
         if (fromDoWhile || fromWhile) {
-            // se pasa directo porque se experan expresiones sencillas
-            appendln(replaceBooleanOps(inpAssignment));
+            appendln(replaceBooleanOps(ctx.getText()));
         } else {
             // no hago nado poque no se de donde vengo
         }

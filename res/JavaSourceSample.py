@@ -62,7 +62,7 @@ class JavaSourceSample:
     while b:
       print(i)
       self.forLoop()
-      b = False
+      b =  False
 
   def doWhileLoop(self):
     print("Test para 'doWhile':")
