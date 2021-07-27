@@ -126,6 +126,20 @@ class JavaSourceSample:
     print(dayString)
     print(dayString2)
 
+  def arrayExample(self):
+    arrayCaracteres = []
+    arrayCaracteres = [None]*10
+    x = arrayCaracteres[2]
+    matriz = []
+    matriz = [[None]*2]*2
+    y = matriz[1][1]
+    arrayChar = ['a','b','c','d','e']
+    arrayInt = [[1,2,3,4],[5,6,7,8]]
+    print(x)
+    print(y)
+    print(arrayChar)
+    print(arrayInt)
+
   def tryStatement(self):
     try:
       numerador = 0
@@ -160,6 +174,8 @@ class JavaSourceSample:
     JavaSourceSample.read()
     print("------------------------------")
     j.tryStatement()
+    print("------------------------------")
+    j.arrayExample()
 
 import sys
 if __name__ == '__main__':

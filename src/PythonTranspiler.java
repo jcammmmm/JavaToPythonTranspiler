@@ -1697,6 +1697,7 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterLocalVariableDeclaration(Java8Parser.LocalVariableDeclarationContext ctx) {
+        // Para arrays
         // impl.
         if (hasParent(ctx, "ForInitContext")) {
             // En el metodo 'basicForStatement' se maneja la variable principal de iteracion.
@@ -1725,10 +1726,28 @@ public class PythonTranspiler implements Java8ParserListener {
                     else if (scannerWasDeclared && (value.contains(".nextLine") || value.contains(".nextInt") || value.contains(".nextDouble") || value.contains(".nextFloat")))
                         value = "input()";
                     else
-                        value = translateStringConcat(replaceBooleanOps(value));
+                        if (identifier.contains("[]")){
+                            //Aquí para array
+                            String value_aux = identifier.split("\\[",2)[1];
+                            value_aux = (char)91 +value_aux;
+                            value = value.replace("{","[").replace("}","]");
+                            identifier = identifier.replace(value_aux, "");
+                        }else {
+                            //Demás casos
+                            value = translateStringConcat(replaceBooleanOps(value));
+                        }
                 } catch (NullPointerException npe) {
                     // este caso sucede cuando no se declara la variable y no se inicializa.
-                    value = getInitValue(type);
+                    if (identifier.contains("[]")){
+                        //Aquí para array
+                        String value_aux = identifier.split("\\[",2)[1];
+                        value = (char)91 +value_aux;
+                        identifier = identifier.replace(value, "");
+                        value = "[]";
+                    }else {
+                        //Demás casos
+                        value = getInitValue(type);
+                    }
                 }
                 appendln(String.format("%s = %s", identifier, value));
             }
@@ -1803,21 +1822,31 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterExpressionStatement(Java8Parser.ExpressionStatementContext ctx) {
-
         String inputExp = ctx.getText();
         inputExp = inputExp.replace("true", "True");
         inputExp = inputExp.replace("false", "False");
         if (hasParent(ctx, "SwitchBlockContext")) {
-            //Para expresiones en switch, falta pulir pero por ahora todo bien
             String switchExpression = inputExp;
             char lastChar = switchExpression.charAt(switchExpression.length() - 1);
             if(lastChar==';'){
                 switchExpression = switchExpression.substring(0, switchExpression.length() - 1);
             }
             appendln(switchExpression);
+        } else if(inputExp.contains("new") && inputExp.contains("[") && inputExp.contains("]")){
+            //Aquí para array
+            String[] inputarray = inputExp.replace("[", " ").replace("]", " ").replace("  "," ").split(" ");
+            String value = inputarray[0].split("=")[0];
+            int ammount = inputarray.length-2;
+            String brackets = "[";
+            value = value +" = "+ brackets.repeat(ammount) + "None";
+            for (int i = 1; i < inputarray.length-1; i++) {
+                value += "]*"+inputarray[i];
+            }
+            appendln(value);
         } else {
-            //
+
         }
+
     }
 
     @Override

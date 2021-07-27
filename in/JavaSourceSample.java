@@ -160,6 +160,29 @@ public class JavaSourceSample {
         System.out.println(dayString2);
     }
 
+    public void arrayExample(){
+        char arrayCaracteres[];
+        arrayCaracteres = new char[10];
+        arrayCaracteres[2] = 'b';
+        char x = arrayCaracteres[2];
+
+        int matriz[][];
+        matriz = new int[2][2];
+
+        matriz[1][1] = 2;
+        int y = matriz[1][1];
+
+        char arrayChar[] = {'a','b','c','d','e'};
+
+        int arrayInt[][] = { {1,2,3,4}, {5,6,7,8}};
+
+        System.out.println(x);
+        System.out.println(y);
+        System.out.println(arrayChar);
+        System.out.println(arrayInt);
+
+    }
+
     public void tryStatement() {
         try {
             int numerador,  denominador,resultado;
@@ -194,5 +217,7 @@ public class JavaSourceSample {
         read();
         System.out.println("------------------------------");
         j.tryStatement();
+        System.out.println("------------------------------");
+        j.arrayExample();
     }
 }
