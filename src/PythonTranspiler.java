@@ -1721,21 +1721,34 @@ public class PythonTranspiler implements Java8ParserListener {
                     // se hace llamado para intentar lanzar nullpointerexception para indicar que la variable no se inizializa y
                     // por tanto corresponde a nosotros inicializarla para compatibilidad con el lenguaje.
                     value = variableDeclarator.variableInitializer().getText();
-                    if (value.contains("new"))
+                    if (value.contains("new") && !identifier.contains("[]")){
                         value = value.substring(3);
-                    else if (scannerWasDeclared && (value.contains(".nextLine") || value.contains(".nextInt") || value.contains(".nextDouble") || value.contains(".nextFloat")))
+                    } else if (scannerWasDeclared && (value.contains(".nextLine") || value.contains(".nextInt") || value.contains(".nextDouble") || value.contains(".nextFloat"))) {
                         value = "input()";
-                    else
-                        if (identifier.contains("[]")){
+                    } else {
+                        if (identifier.contains("[]")) {
                             //Aquí para array
-                            String value_aux = identifier.split("\\[",2)[1];
-                            value_aux = (char)91 +value_aux;
-                            value = value.replace("{","[").replace("}","]");
-                            identifier = identifier.replace(value_aux, "");
-                        }else {
+                            if(value.contains("new")){
+                                String[] inputarray = value.replace("[", " ").replace("]", " ").replace("  "," ").split(" ");
+                                print(inputarray[0]);
+                                int ammount = inputarray.length-1;
+                                String brackets = "[";
+                                value = brackets.repeat(ammount) + "None";
+                                for (int i = 1; i < inputarray.length; i++) {
+                                    value += "]*"+inputarray[i];
+                                }
+                                identifier = identifier.replace("[", "").replace("]", "");
+                            }else {
+                                String value_aux = identifier.split("\\[", 2)[1];
+                                value_aux = (char) 91 + value_aux;
+                                value = value.replace("{", "[").replace("}", "]");
+                                identifier = identifier.replace(value_aux, "");
+                            }
+                        } else {
                             //Demás casos
                             value = translateStringConcat(replaceBooleanOps(value));
                         }
+                    }
                 } catch (NullPointerException npe) {
                     // este caso sucede cuando no se declara la variable y no se inicializa.
                     if (identifier.contains("[]")){

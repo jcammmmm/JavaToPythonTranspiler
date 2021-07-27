@@ -163,6 +163,8 @@ public class JavaSourceSample {
     public void arrayExample(){
         char arrayCaracteres[];
         arrayCaracteres = new char[10];
+        char arrayCaracteres2[] = new char[10];
+        char arrayCaracteres3[][] = new char[10][10];
         arrayCaracteres[2] = 'b';
         char x = arrayCaracteres[2];
 
@@ -179,6 +181,8 @@ public class JavaSourceSample {
         System.out.println(x);
         System.out.println(y);
         System.out.println(arrayChar);
+        System.out.println(arrayCaracteres2);
+        System.out.println(arrayCaracteres3);
         System.out.println(arrayInt);
 
     }

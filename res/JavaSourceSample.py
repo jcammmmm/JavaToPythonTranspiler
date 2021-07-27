@@ -129,6 +129,8 @@ class JavaSourceSample:
   def arrayExample(self):
     arrayCaracteres = []
     arrayCaracteres = [None]*10
+    arrayCaracteres2 = [None]*10
+    arrayCaracteres3 = [[None]*10]*10
     x = arrayCaracteres[2]
     matriz = []
     matriz = [[None]*2]*2
@@ -138,6 +140,8 @@ class JavaSourceSample:
     print(x)
     print(y)
     print(arrayChar)
+    print(arrayCaracteres2)
+    print(arrayCaracteres3)
     print(arrayInt)
 
   def tryStatement(self):
