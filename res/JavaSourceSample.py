@@ -37,10 +37,10 @@ class JavaSourceSample:
         print("A la playa!!!")
       else:
         print("Esperando al buen tiempo...")
-      if (condicion1):
+      if (condicion1==True):
         print("A")
       else:
-        if (condicion2):
+        if (condicion2==False):
           print("B")
         else:
           if (condicion2):
@@ -50,6 +50,28 @@ class JavaSourceSample:
                 print("Esperando al buen tiempo...")
           else:
             print("D")
+
+  def whileLoop(self):
+    print("Test para 'while':")
+    i = 2
+    b = True
+    while i<10:
+      print(i)
+      self.forLoop()
+      i = i+1
+    while b:
+      print(i)
+      self.forLoop()
+      b = False
+
+  def doWhileLoop(self):
+    print("Test para 'doWhile':")
+    i = 1
+    while True:
+      print('{}{}'.format("iteracion: ", i))
+      i = i+1
+      if not i<=3:
+        break
 
   def switchExample(self):
     day = 5
@@ -85,23 +107,6 @@ class JavaSourceSample:
       dayString2="3"
     print(dayString)
     print(dayString2)
-
-  def whileLoop(self):
-    print("Test para 'while':")
-    i = 2
-    while i<10:
-      print(i)
-      self.forLoop()
-      i = i+1
-
-  def doWhileLoop(self):
-    print("Test para 'doWhile':")
-    i = 1
-    while True:
-      print('{}{}'.format("iteracion: ", i))
-      i = i+1
-      if not i<=3:
-        break
 
   def forLoop(self):
     i = 2

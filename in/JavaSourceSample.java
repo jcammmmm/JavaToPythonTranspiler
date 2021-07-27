@@ -49,9 +49,9 @@ public class JavaSourceSample {
             System.out.println("Esperando al buen tiempo...");
         }
 
-        if (condicion1) {
+        if (condicion1==true) {
             System.out.println("A");
-        } else if (condicion2) {
+        } else if (condicion2==false) {
             System.out.println("B");
         } else if (condicion2) {
             if (temperatura > 25) {
@@ -62,6 +62,32 @@ public class JavaSourceSample {
         } else {
             System.out.println("D");
         }
+    }
+
+
+    public void whileLoop() {
+        System.out.println("Test para 'while':");
+        int i = 2;
+        boolean b = true;
+        while (i < 10) {
+            System.out.println(i);
+            forLoop();
+            i = i + 1;
+        }
+        while (b) {
+            System.out.println(i);
+            forLoop();
+            b = false;
+        }
+    }
+
+    public void doWhileLoop() {
+        System.out.println("Test para 'doWhile':");
+        int i = 1;
+        do {
+            System.out.println("iteracion: " + i);
+            i = i + 1;
+        } while(i <= 3);
     }
 
     public void switchExample() {
@@ -120,24 +146,8 @@ public class JavaSourceSample {
         System.out.println(dayString2);
     }
 
-    public void whileLoop() {
-        System.out.println("Test para 'while':");
-        int i = 2;
-        while (i < 10) {
-            System.out.println(i);
-            forLoop();
-            i = i + 1;
-        }
-    }
 
-    public void doWhileLoop() {
-        System.out.println("Test para 'doWhile':");
-        int i = 1;
-        do {
-            System.out.println("iteracion: " + i);
-            i = i + 1;
-        } while(i <= 3);
-    }
+
 
     public void forLoop() {
         for (int i = 2; i < 500 && i%1==0; i = i*i) {

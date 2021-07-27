@@ -1730,6 +1730,8 @@ public class PythonTranspiler implements Java8ParserListener {
                     // este caso sucede cuando no se declara la variable y no se inicializa.
                     value = getInitValue(type);
                 }
+                value = value.replace("true", "True");
+                value = value.replace("false", "False");
                 appendln(String.format("%s = %s", identifier, value));
             }
         }
@@ -1803,10 +1805,13 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterExpressionStatement(Java8Parser.ExpressionStatementContext ctx) {
-        // impl.
+
+        String inputExp = ctx.getText();
+        inputExp = inputExp.replace("true", "True");
+        inputExp = inputExp.replace("false", "False");
         if (hasParent(ctx, "SwitchBlockContext")) {
             //Para expresiones en switch, falta pulir pero por ahora todo bien
-            String switchExpression = ctx.getText();
+            String switchExpression = inputExp;
             char lastChar = switchExpression.charAt(switchExpression.length() - 1);
             if(lastChar==';'){
                 switchExpression = switchExpression.substring(0, switchExpression.length() - 1);
@@ -1836,6 +1841,8 @@ public class PythonTranspiler implements Java8ParserListener {
     public void enterIfThenStatement(Java8Parser.IfThenStatementContext ctx) {
         // impl.
         String ifExpr = ctx.expression().getText();
+        ifExpr = ifExpr.replace("true", "True");
+        ifExpr = ifExpr.replace("false", "False");
         String ifDcl = String.format("if (%s):", ifExpr);
         appendln(ifDcl);
     }
@@ -1854,7 +1861,10 @@ public class PythonTranspiler implements Java8ParserListener {
             tabDepth++;
         }
         String ifExpr = ctx.expression().getText();
+        ifExpr = ifExpr.replace("true", "True");
+        ifExpr = ifExpr.replace("false", "False");
         String ifDcl = String.format("if (%s):", ifExpr);
+
         appendln(ifDcl);
 
     }
@@ -1872,6 +1882,8 @@ public class PythonTranspiler implements Java8ParserListener {
     public void enterIfThenElseStatementNoShortIf(Java8Parser.IfThenElseStatementNoShortIfContext ctx) {
         // impl.
         String ifExpr = ctx.expression().getText();
+        ifExpr = ifExpr.replace("true", "True");
+        ifExpr = ifExpr.replace("false", "False");
         String ifDcl = String.format("if (%s):", ifExpr);
         appendln(ifDcl);
     }
@@ -2578,6 +2590,8 @@ public class PythonTranspiler implements Java8ParserListener {
                     methodInvocationExpr = String.format("self.%s(%s)", methodName, args);
                 }
             }
+            methodInvocationExpr = methodInvocationExpr.replace("true", "True");
+            methodInvocationExpr = methodInvocationExpr.replace("false", "False");
             appendln(methodInvocationExpr);
         }
     }
@@ -2749,11 +2763,16 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterAssignment(Java8Parser.AssignmentContext ctx) {
+
         // impl.
         boolean fromWhile = hasParent(ctx, "WhileStatementContext");
         boolean fromDoWhile = hasParent(ctx, "DoStatementContext");
+        String inpAssignment = ctx.getText();
+        inpAssignment = inpAssignment.replace("true", "True");
+        inpAssignment = inpAssignment.replace("false", "False");
         if (fromDoWhile || fromWhile) {
-            appendln(replaceBooleanOps(ctx.getText()));
+            // se pasa directo porque se experan expresiones sencillas
+            appendln(replaceBooleanOps(inpAssignment));
         } else {
             // no hago nado poque no se de donde vengo
         }
