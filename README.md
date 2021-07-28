@@ -27,19 +27,21 @@ El codigo fuente en Java se supone que tiene las siguientes características:
 - (Soportado!) Todos los metodos de la fuente en Java deben ser estáticos   
 - Expresiones i++ no se soportan.
 - En excepciones solo es soportado el `ArithmeticException`, `EOFException`  y `Exception` 
+
 ### Ciclos
 - Solo se admiten expresiones booleanas dentro de la condicion de terminacion
   del ciclo.
-#### *for*
-- La variable principal de iteracion de un ciclo for se declara dentro del 
+- **For**: La variable principal de iteracion de un ciclo for se declara dentro del 
   ciclo y se realiza mediante los tipos `int` o `double`. Esto para lograr
   compatibilidad con los ciclos de python.
   Sólo se permite una sola variable declarada en el ciclo. No se permiten
   listas de declaraciones o asignaciones (ver `statementExpressionList`) en
   la gramática.
-
-
-
+  Los ciclos *for* en Java se traducen como *while*
+- **While**: La traducción es directa
+- **DoWhile**: La traducción se hace con un ciclo infinito, cuya ultima expresión
+  es una condición la expresión booleana invertida de terminación.
+  
 En codigos de fuente sencillos de Java se debe instanciar la clase principal dentro del
 método estático principal `main()` para poder ejecutar el programa y no abusar de los 
 métodos estáticos y conservar métodos y atributos de instancia sin la necesidad de la 
