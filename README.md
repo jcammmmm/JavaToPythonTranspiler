@@ -1,4 +1,19 @@
-# Suposiones
+# JavaToPythonTranspiler
+
+## Manual de compilacion
+
+1. Abrir el proyecto con IntelliJ
+2. Click derecho en la carpeta del proyecto y clickear en open module settings.
+3. Seleccionar Sources, seleccionamos la carpeta gen y le damos Mark as: Sources.
+4. (Si se tiene descargado jar de antlr 4.9.2 pasar a paso 6). Descargar ANTLR de https://www.antlr.org/dowload.html
+5. En la seccion ANTLR toll and Java Target seleccionar Complete ANTLR 4.9.2 Java binaries jar.
+6. Seleccionamos Dependencies y se oprime en añadir JARs or Directory.
+7. Buscamos el jar de ANTLR y se oprime ok, se marca la casilla del jay y se le da apply y ok.
+8. En la carpeta in se agregan todos los archivos que se quieren traducir.
+9. En `src\Main.java` en el arreglo `samples` se agrega la ruta de los archivos que se quieren traducir.
+10. Ya podemos ejecutar el proyecto y los archivos traducidos se encontraran en la carpeta `res\`
+
+## Suposiones
 El codigo fuente en Java se supone que tiene las siguientes características:   
 - No se usan parametros anotados en las funciones    
 - No se usa el spread operator e.g. String...   
@@ -9,7 +24,7 @@ El codigo fuente en Java se supone que tiene las siguientes características:
   la identacion del codigo fuente en algunos casos. Por ejemplo en `for (i = 0; i < 2; i++) print(i)` 
 - (Soportado!) Todos los metodos de la fuente en Java deben ser estáticos   
 - Expresiones i++ no se soportan.
-
+- En excepciones solo es soportado el `ArithmeticException`, `EOFException`  y `Exception` 
 ### Ciclos
 - Solo se admiten expresiones booleanas dentro de la condicion de terminacion
   del ciclo.
