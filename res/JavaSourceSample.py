@@ -30,26 +30,35 @@ class JavaSourceSample:
     condicion1 = True
     condicion2 = False
     if (temperatura>25):
-      print("A la playa!!!")
-    if (temperatura<=25):
-      print("Esperando al buen tiempo...")
       if (temperatura>25):
         print("A la playa!!!")
       else:
         print("Esperando al buen tiempo...")
-      if (condicion1==True):
-        print("A")
+      
+    if (temperatura<=25):
+      print("Esperando al buen tiempo...")
+    if (temperatura>25):
+      print("A la playa!!!")
+    else:
+      print("Esperando al buen tiempo...")
+    
+    if (condicion1==True):
+      print("A")
+    else:
+      if (condicion2==False):
+        print("B")
       else:
-        if (condicion2==False):
-          print("B")
-        else:
-          if (condicion2):
-              if (temperatura>25):
-                print("A la playa!!!")
-              else:
-                print("Esperando al buen tiempo...")
+        if (condicion2):
+          if (temperatura>25):
+            print("A la playa!!!")
           else:
-            print("D")
+            print("Esperando al buen tiempo...")
+          
+        else:
+          print("D")
+        
+      
+    
 
   def whileLoop(self):
     print("Test para 'while':")

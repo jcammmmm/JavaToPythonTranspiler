@@ -1730,7 +1730,6 @@ public class PythonTranspiler implements Java8ParserListener {
                             //Aquí para array
                             if(value.contains("new")){
                                 String[] inputarray = value.replace("[", " ").replace("]", " ").replace("  "," ").split(" ");
-                                print(inputarray[0]);
                                 int ammount = inputarray.length-1;
                                 String brackets = "[";
                                 value = brackets.repeat(ammount) + "None";
@@ -1774,23 +1773,55 @@ public class PythonTranspiler implements Java8ParserListener {
 
     @Override
     public void enterStatement(Java8Parser.StatementContext ctx) {
+        String stateInput = ctx.getText();
+        if(stateInput.length()<3){
+            stateInput = "empty";
+        }
+        String stat = stateInput.substring(0,3);
+        if (stat.equals("if(") && ctx.getParent().getClass().getName()=="Java8Parser$IfThenElseStatementContext"){
+            tabDepth++;
+        }else{
 
+        }
     }
 
     @Override
     public void exitStatement(Java8Parser.StatementContext ctx) {
+        String stateInput = ctx.getText();
+        if(stateInput.length()<3){
+            stateInput = "empty";
+        }
+        String stat = stateInput.substring(0,3);
 
+        if (ctx.getParent().getClass().getName()=="Java8Parser$IfThenElseStatementContext"){
+            if (stat.equals("if(")) {
+                tabDepth--;
+            }
+            appendln("");
+        }else{
+
+        }
     }
 
     @Override
     public void enterStatementNoShortIf(Java8Parser.StatementNoShortIfContext ctx) {
 
+        if (ctx.getParent().getClass().getName()=="Java8Parser$IfThenElseStatementNoShortIfContext"){
+            tabDepth++;
+        }else{
+
+        }
     }
 
     @Override
     public void exitStatementNoShortIf(Java8Parser.StatementNoShortIfContext ctx) {
         // impl.
         appendln("else:");
+        if (ctx.getParent().getClass().getName()=="Java8Parser$IfThenElseStatementNoShortIfContext"){
+            tabDepth--;
+        }else{
+
+        }
     }
 
     @Override
@@ -1895,11 +1926,6 @@ public class PythonTranspiler implements Java8ParserListener {
     @Override
     public void enterIfThenElseStatement(Java8Parser.IfThenElseStatementContext ctx) {
         // impl.
-        boolean noShortIfParent = hasParent(ctx, "StatementContext");
-
-        if (noShortIfParent) {
-            tabDepth++;
-        }
         String ifExpr = ctx.expression().getText();
         ifExpr = ifExpr.replace("true", "True");
         ifExpr = ifExpr.replace("false", "False");
@@ -1912,10 +1938,6 @@ public class PythonTranspiler implements Java8ParserListener {
     @Override
     public void exitIfThenElseStatement(Java8Parser.IfThenElseStatementContext ctx) {
         // impl.
-        boolean noShortIfParent = hasParent(ctx, "StatementContext");
-        if (noShortIfParent) {
-            tabDepth--;
-        }
     }
 
     @Override
